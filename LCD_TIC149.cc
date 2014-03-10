@@ -9,10 +9,76 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <fstream>
+#include <iconv.h>
+
 #include "I2CBus.h"
 #include "LCD_TIC149.h"
 
-LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast)
+View_LCD::View_LCD(const int _columns,const int _rows) : rows_in_screen(_rows)//height_LCD/8
+{
+    //rows_LCD=new row_LCD[_rows](_columns);
+    rows_LCD=new row_LCD*[_rows];
+    for(int i=0;i<_rows;i++)
+    {
+        rows_LCD[i]=new row_LCD(_columns);
+    }
+}
+View_LCD::~View_LCD() 
+{
+    for(int i=0;i<rows_in_screen;i++)
+    {
+        delete rows_LCD[i];
+    }
+    delete[] rows_LCD;
+    printf("Destructor View_LCD\n");
+};
+
+void View_LCD::point(const int _column,const int _height,const unsigned char _color)
+{
+    int _rows=_height/8;
+    if (_rows>=rows_in_screen) return;//Нет такой строки
+    rows_LCD[_rows]->point(_column,_height % 8,_color);
+}
+
+std::string View_LCD::iconv_recode(const std::string& from, const std::string& to, std::string text)
+{
+    iconv_t cnv = iconv_open(to.c_str(), from.c_str());
+    if (cnv == (iconv_t) - 1)
+    {
+        iconv_close(cnv);
+        return "";
+    }
+    char *outbuf;
+    if ((outbuf = (char *) malloc(text.length()*2 + 1)) == NULL)
+    {
+        iconv_close(cnv);
+        return "";
+    }
+    char *ip = (char *) text.c_str(), *op = outbuf;
+    size_t icount = text.length(), ocount = text.length()*2;
+
+    if (iconv(cnv, &ip, &icount, &op, &ocount) != (size_t) - 1)
+    {
+        outbuf[text.length()*2 - ocount] = '\0';
+        text = outbuf;// после вызова iconv адреса разные. Результат работы iconv находится в outbuf, а op указывает на другой не коректный адрес
+    }
+    else
+    {
+        text = "";
+    }
+
+    free(outbuf);
+    iconv_close(cnv);
+    return text;
+}
+
+std::string View_LCD::recodeUTF8toCP1251(const std::string& text)
+{
+    return iconv_recode("UTF-8","CP1251",text);
+}
+
+LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast) : View_LCD(width_LCD,height_LCD/8)
 {
 	mI2CBus=m_I2CBus;
 	init_lcd(contrast);
@@ -146,7 +212,7 @@ void LCD_TIC149::set_lcd_contrast(unsigned char lcd_k)
 		 mI2CBus->send_buffer();
 }
 
-void LCD_TIC149::clear_lcd()
+void LCD_TIC149::clear_lcd_old()
 {
 //очистка ОЗУ драйвера
         mI2CBus->write_to_buffer(0b00000000);         // control byte
@@ -166,7 +232,7 @@ void LCD_TIC149::clear_lcd()
 		 mI2CBus->send_buffer();
 }
 
-void LCD_TIC149::lcd_screen_buffer()
+void LCD_TIC149::lcd_screen_buffer_old()
 {
 //картинка на индикатор
         mI2CBus->write_to_buffer(0b00000000);         // control byte
@@ -190,7 +256,7 @@ void LCD_TIC149::lcd_screen_buffer()
 }
 
 
-void LCD_TIC149::lcd_screen()
+void LCD_TIC149::lcd_screen_old()
 {
 //картинка на индикатор
         mI2CBus->write_to_buffer(0b00000000);         // control byte
@@ -402,8 +468,10 @@ void X<T>::mf(const U &u)
 //Шаблон должен принимать на вход массив экземпляторов классов и число проходов при рисовании
 //template <int PART_COUNTX, class[] Font>//,sUnit24 Tahoma_24
 //Вроде должно быть (offset_x_buffer<width) - проверить работу этого условия
-void LCD_TIC149::print_lcd_8(char x,char y,char* str1, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_8_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
 {
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
 	if (width>=width_LCD) width=width_LCD;
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT8; i_lcd++)//Делаем в 3 прохода
      {
@@ -440,8 +508,10 @@ void LCD_TIC149::print_lcd_8(char x,char y,char* str1, int width, unsigned char 
                 }
 	}
 }
-void LCD_TIC149::print_lcd_16(char x,char y,char* str1, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_16_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
 {
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT16; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -474,8 +544,10 @@ void LCD_TIC149::print_lcd_16(char x,char y,char* str1, int width, unsigned char
                 }
 	}
 }
-void LCD_TIC149::print_lcd_24(char x,char y,char* str1, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_24_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
 {
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT24; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -508,8 +580,10 @@ void LCD_TIC149::print_lcd_24(char x,char y,char* str1, int width, unsigned char
                 }
 	}
 }
-void LCD_TIC149::print_lcd_32(char x,char y,char* str1, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_32_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
 {
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT32; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;

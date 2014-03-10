@@ -1,9 +1,93 @@
-//Чтобы русские символы нормально отображались нужно, чтобы была кодировка файл с текстом Windows-1251 - т.е. main.cc
-//Заполнение экрана данными происходит построчно (1 строка в высоту 8 пикселей) слева направо сверху вниз
+//Р§С‚РѕР±С‹ СЂСѓСЃСЃРєРёРµ СЃРёРјРІРѕР»С‹ РЅРѕСЂРјР°Р»СЊРЅРѕ РѕС‚РѕР±СЂР°Р¶Р°Р»РёСЃСЊ РЅСѓР¶РЅРѕ, С‡С‚РѕР±С‹ Р±С‹Р»Р° РєРѕРґРёСЂРѕРІРєР° С„Р°Р№Р» СЃ С‚РµРєСЃС‚РѕРј Windows-1251 - С‚.Рµ. main.cc
+//Р—Р°РїРѕР»РЅРµРЅРёРµ СЌРєСЂР°РЅР° РґР°РЅРЅС‹РјРё РїСЂРѕРёСЃС…РѕРґРёС‚ РїРѕСЃС‚СЂРѕС‡РЅРѕ (1 СЃС‚СЂРѕРєР° РІ РІС‹СЃРѕС‚Сѓ 8 РїРёРєСЃРµР»РµР№) СЃР»РµРІР° РЅР°РїСЂР°РІРѕ СЃРІРµСЂС…Сѓ РІРЅРёР·
+
+//Р”Р»СЏ РІС‹РІРѕРґР° РЅР° СЌРєСЂР°РЅ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ Р±РёР±Р»РёРѕС‚РµРєР° СЃРёРјРІРѕР»РѕРІ, Р·Р°РєРѕРґРёСЂРѕРІР°РЅРЅС‹С… СЃ РїРѕРјРѕС‰СЊСЋ Windows-1251
+//Р РµС€РµРЅРёРµ РїСЂРѕР±Р»РµРјС‹: 
 
 class I2CBus;
 
-class LCD_TIC149
+/*class ProtoView
+{
+public:
+	//virtual void action() = 0;
+};*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+//РљР»Р°СЃСЃ, СЃРѕРґРµСЂР¶Р°С‰РёР№ РѕРґРЅСѓ СЃС‚СЂРѕРєСѓ
+class row_LCD
+{
+public:
+	row_LCD(const int _columns) : columns_in_row(_columns)
+	{
+		data=new unsigned char[_columns];
+	};
+	~row_LCD() {delete[] data;printf("Destructor row_LCD\n");};
+	void write(const int column,const unsigned char value) 
+	{
+		if (column<columns_in_row)
+			data[column]=value;
+	};
+	unsigned char read(const int column) const 
+	{
+		if (column<columns_in_row)
+			return data[column];
+		else
+			return 0;
+	};
+	unsigned char* get_row() const
+	{
+		return data;
+	}
+	void point(const int _column,const unsigned char _height,const unsigned char color=1)
+	{
+		if (_column>=columns_in_row) return;//РќРµС‚ С‚Р°РєРѕР№ РєРѕР»РѕРЅРєРё
+		if (_height>7) return;
+		if (color!=0)
+		{
+			data[_column]|=(1<<_height);//РњРѕР¶РµС‚ РѕРєР°Р·Р°С‚СЊСЃСЏ (7-_height)
+		}
+		else
+		{
+			data[_column]&=~(1<<_height);//РњРѕР¶РµС‚ РѕРєР°Р·Р°С‚СЊСЃСЏ (7-_height)
+		}
+	}
+private:
+	const int columns_in_row;//Р›РёС€РЅРёРµ 4 Р±Р°Р№С‚Р° РґР»СЏ РєР°Р¶РґРѕР№ СЃС‚СЂРѕРєРё
+	unsigned char* data;
+};
+
+
+//        columns (x)
+//        0123456 .. 133
+//        1
+//rows(y) 2
+//		 ..
+//		 64
+
+//РЎРѕРґРµСЂР¶РёС‚ РІСЃРµ СЃС‚СЂРѕРєРё
+class View_LCD// : public ProtoView
+{
+public:
+	View_LCD(const int _columns,const int _rows);//height_LCD/8
+	~View_LCD();
+
+//РЎСЋРґР° РїРµСЂРµРЅРµСЃС‚Рё СЂРёСЃРѕРІР°РЅРёРµ С‚РµРєСЃС‚Р°
+	void point(const int _column,const int _height,const unsigned char _color=1);
+
+	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
+	static std::string recodeUTF8toCP1251(const std::string& text);
+
+private:
+	const int rows_in_screen;
+	row_LCD** rows_LCD;//РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°СЃСЃРёРІ СѓРєР°Р·Р°С‚РµР»РµР№
+};
+
+
+
+
+class LCD_TIC149 : public View_LCD
 {
 public:
 	LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast);
@@ -18,24 +102,22 @@ public:
 	void lcd_rotate_0();
 	void lcd_rotate_180();
 	void set_lcd_contrast(unsigned char lcd_k);
-	void clear_lcd();
-	void lcd_screen();
+	void clear_lcd_old();//РћС‡РёС‰Р°РµС‚ С‚РѕР»СЊРєРѕ СЌРєСЂР°РЅ, Р° РЅРµ РјР°СЃСЃРёРІ
+	void lcd_screen_old();
 	
-	void lcd_screen_buffer();
-	void write_lcd_screen_buffer(int pos, unsigned char value) {screen_buffer[pos]=value;};
+	void lcd_screen_buffer_old();
+	void write_lcd_screen_buffer_old(int pos, unsigned char value) {screen_buffer[pos]=value;};
 	
-//x считается в пикелях
-//y в строках (каждая строка 8 бит (пикселей)
-	void print_lcd_8(char x,char y,char* str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_16(char x,char y,char* str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_24(char x,char y,char* str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_32(char x,char y,char* str1, int width=width_LCD, unsigned char INVERT=0);
-//Вывод на экран строки определённой ширины, если больше - то не выводятся
+//x СЃС‡РёС‚Р°РµС‚СЃСЏ РІ РїРёРєРµР»СЏС…
+//y РІ СЃС‚СЂРѕРєР°С… (РєР°Р¶РґР°СЏ СЃС‚СЂРѕРєР° 8 Р±РёС‚ (РїРёРєСЃРµР»РµР№)
+	void print_lcd_8_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_16_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_24_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_32_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
+//Р’С‹РІРѕРґ РЅР° СЌРєСЂР°РЅ СЃС‚СЂРѕРєРё РѕРїСЂРµРґРµР»С‘РЅРЅРѕР№ С€РёСЂРёРЅС‹, РµСЃР»Рё Р±РѕР»СЊС€Рµ - С‚Рѕ РЅРµ РІС‹РІРѕРґСЏС‚СЃСЏ
 
-
-	
 private:
-	I2CBus* mI2CBus;//По идее лучше использовать ссылку - как правильно её инициализировать?
+	I2CBus* mI2CBus;//РџРѕ РёРґРµРµ Р»СѓС‡С€Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЃСЃС‹Р»РєСѓ - РєР°Рє РїСЂР°РІРёР»СЊРЅРѕ РµС‘ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ?
 
 	const static unsigned char screen_logo[1064];
 	
