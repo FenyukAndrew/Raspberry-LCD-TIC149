@@ -73,8 +73,10 @@ public:
 	View_LCD(const int _columns,const int _rows);//height_LCD/8
 	~View_LCD();
 
-//Сюда перенести рисование текста
+
 	void point(const int _column,const int _height,const unsigned char _color=1);
+
+//Сюда перенести рисование текста	
 
 	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
 	static std::string recodeUTF8toCP1251(const std::string& text);
