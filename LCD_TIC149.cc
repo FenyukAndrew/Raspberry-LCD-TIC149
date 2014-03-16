@@ -15,26 +15,45 @@
 #include "I2CBus.h"
 #include "LCD_TIC149.h"
 
-View_LCD::View_LCD(const int _columns,const int _rows) : rows_in_screen(_rows)//height_LCD/8
+View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)//height_LCD/8
 {
-    //rows_LCD=new row_LCD[_rows](_columns);
-    rows_LCD=new row_LCD*[_rows];
+    rows_LCD.reserve(_rows);
+    for(int i=0;i<_rows;i++)
+    {
+        rows_LCD.push_back(new row_LCD(_columns));
+    }
+    /*rows_LCD=new row_LCD*[_rows];
     for(int i=0;i<_rows;i++)
     {
         rows_LCD[i]=new row_LCD(_columns);
-    }
+    }*/
 }
 View_LCD::~View_LCD() 
 {
-    for(int i=0;i<rows_in_screen;i++)
+    for (std::vector<row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    {
+        //it->~row_LCD();
+        delete(*it);
+    }
+    rows_LCD.resize(0);
+
+    /*for(int i=0;i<rows_in_screen;i++)
     {
         delete rows_LCD[i];
     }
-    delete[] rows_LCD;
+    delete[] rows_LCD;*/
     printf("Destructor View_LCD\n");
 };
 
-void View_LCD::point(const int _column,const int _height,const unsigned char _color)
+void View_LCD::clear_lcd()
+{
+    for (std::vector<row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    {
+        (*it)->clear_row();
+    }
+}
+
+void View_LCD::point(const ushort _column,const ushort _height,const unsigned char _color)
 {
     int _rows=_height/8;
     if (_rows>=rows_in_screen) return;//Нет такой строки
@@ -77,6 +96,281 @@ std::string View_LCD::recodeUTF8toCP1251(const std::string& text)
 {
     return iconv_recode("UTF-8","CP1251",text);
 }
+
+//>>>>> РИСОВАНИЕ СИМВОЛОВ
+//Black_New[Номер символа]
+//Black_New[pos_str].sH.cyPix;//Необходимое количество выводимых байт (т.е. 19-x)
+//Black_New[pos_str].b[];//Верхняя строка все нечётные - нижняя все чётные 
+   
+//Общий для всех шрифтов, сгенерированных LCDicon
+struct sHeader
+   {         
+        //flash char ccChar;              // optional char 
+        int cxPix;
+        int cyPix;
+   };
+
+template<int T>
+struct sUnitN {
+        sHeader sH;               // header 
+        unsigned char b[T];          // Data 
+};
+const int PART_COUNT8=1;
+const int PART_COUNT16=2;
+const int PART_COUNT24=3;
+const int PART_COUNT32=4;
+//Маскимальная длина символа высотой 24 - определять по программе - скорее всего буква Щ
+const int SYM_8_LONG=20;
+const int SYM_16_LONG=30;
+const int SYM_24_LONG=40;//28
+const int SYM_32_LONG=50;
+typedef sUnitN<SYM_8_LONG*PART_COUNT8> sUnit8;
+typedef sUnitN<SYM_16_LONG*PART_COUNT16> sUnit16;
+typedef sUnitN<SYM_24_LONG*PART_COUNT24> sUnit24;
+typedef sUnitN<SYM_32_LONG*PART_COUNT32> sUnit32;
+
+#include "Arial_8.h"
+#include "Tahoma_16.h"
+#include "Tahoma_24.h"
+#include "Tahoma_32.h"
+
+//Пример кода с http://programmersclub.ru/29/
+//Шаблоны функций класса http://msdn.microsoft.com/ru-ru/library/swta9c6e.aspx
+//http://valera.asf.ru/cpp/book/c10.html
+/*template<class T,class T1> void show_array( T *array,T1 count)
+{
+   T1 index;
+   for (index =0; index < count; index++) cout << array[index] “ ' ';
+   cout << endl;
+}
+
+void show_array(int *, int);
+
+void show_array(float *, unsigned);
+
+void main(void)
+
+{
+   int pages[] = { 100, 200, 300, 400, 500 };
+   float pricesH = { 10.05, 20.10, 30.15 };
+   show_array(pages, 5);
+   show_array(prices, 3);
+} */
+   
+/*template<typename T>
+class X
+{
+public:
+   template<typename U>
+   void mf(const U &u);
+};
+
+template<typename T> template <typename U>
+void X<T>::mf(const U &u)
+{
+}*/
+
+//PART_COUNT, Tahoma_24
+//x считается в пикелях
+//y в строках (каждая строка 8 бит (пикселей)
+
+//16.1. Определение шаблона класса
+//http://valera.asf.ru/cpp/book/c16.shtml
+//template <int PART_COUNTX>
+
+
+/*template <class int1>
+class Queue {
+public:
+   Queue() { }
+   ~Queue();
+private:
+    int1 I1;
+};*/
+
+//Чтобы создать класс Queue для объектов типа string, надо написать:
+//Queue<string> qs;
+
+//Шаблон должен принимать на вход массив экземпляторов классов и число проходов при рисовании
+//template <int PART_COUNTX, class[] Font>//,sUnit24 Tahoma_24
+//Вроде должно быть (offset_x_buffer<width) - проверить работу этого условия
+    //Использовать как заготовку для шаблона
+    //PART_COUNT8 - можно сделать несколько классов, в которых определить как константу
+    //Arial_8 - в классе возможно определить переменную и присвоить ей значение глобальной переменной
+
+//Нужен шаблон функции или класса, что же все таки нужно?
+//10.1. Определение шаблона функции
+//http://cpp.com.ru/lippman/c10.html
+//Но при конкретизации - ничего не задается
+template <class Type, int size>
+Type min( const Type (&r_array)[size] )
+{
+   /* параметризованная функция для отыскания
+    * минимального значения в массиве */
+   Type min_val = r_array[0];
+   for ( int i = 1; i < size; ++i )
+      if ( r_array[i] < min_val )
+         min_val = r_array[i];
+   return min_val;
+}
+
+//Даже лучше не шаблон, а универсальную функцию, вызываемую из нескльких других функций
+//private:
+//void print_lcd_XX(ushort x,ushort y,const std::string& str1, ushort width, unsigned char INVERT,unsigned char value_PART_COUNT,unsigned char* Font);
+
+void View_LCD::print_lcd_8(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char INVERT)
+{
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
+    if (width==MAX_WIDTH_LCD) width=columns_in_row;
+    if (width>columns_in_row) width=columns_in_row;
+     for(unsigned char i_lcd = 0; i_lcd < PART_COUNT8; i_lcd++)//Делаем в 3 прохода
+     {
+                ushort offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++             
+                for(unsigned char pos_str=0;pos_str<strlen(str1);pos_str++)//проходим по всем символам строки
+                {
+                     unsigned char symbol=str1[pos_str];
+                      for(int count = (Arial_8[symbol].sH.cyPix-1)*PART_COUNT8; count >= 0; count-=PART_COUNT8)
+                      {
+                         if (offset_x_buffer<width)//Лишнее обрезаем, т.е. не выводим на дисплей
+                         {
+                            ushort offset_y_buffer=y+i_lcd;
+                            if (offset_y_buffer<rows_in_screen)//Чтобы не было ошибки при выводе ниже нижней границы экрана
+                            {
+                                (rows_LCD[offset_y_buffer])->write(offset_x_buffer,Arial_8[symbol].b[count+i_lcd]);
+                                offset_x_buffer++;
+                            }
+                        }
+                /*while ((++pos_lcd)<=133)
+                {    
+                           if (!INVERT)
+                           { 
+                              mI2CBus->write_to_buffer(Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                           else
+                           { 
+                              mI2CBus->write_to_buffer(~Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                         }
+                }*/
+                   }
+                }
+    }
+}
+void View_LCD::print_lcd_16(ushort x,ushort y,const std::string& strIn, ushort width, unsigned char INVERT)
+{
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
+    if (width==MAX_WIDTH_LCD) width=columns_in_row;
+    if (width>columns_in_row) width=columns_in_row;
+     for(unsigned char i_lcd = 0; i_lcd < PART_COUNT16; i_lcd++)//Делаем в 3 прохода
+     {
+                ushort offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++             
+                for(unsigned char pos_str=0;pos_str<strlen(str1);pos_str++)//проходим по всем символам строки
+                {
+                     unsigned char symbol=str1[pos_str];
+                      for(int count = (Tahoma_16[symbol].sH.cyPix-1)*PART_COUNT16; count >= 0; count-=PART_COUNT16)
+                      {
+                         if (offset_x_buffer<width)//Лишнее обрезаем, т.е. не выводим на дисплей
+                         {
+                            ushort offset_y_buffer=y+i_lcd;
+                            if (offset_y_buffer<rows_in_screen)//Чтобы не было ошибки при выводе ниже нижней границы экрана
+                            {
+                                (rows_LCD[offset_y_buffer])->write(x,Tahoma_16[symbol].b[count+i_lcd]);
+                                offset_x_buffer++;
+                            }
+                        }
+                          /* if (!INVERT)
+                           { 
+                              mI2CBus->write_to_buffer(Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                           else
+                           { 
+                              mI2CBus->write_to_buffer(~Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                         }*/
+                   }
+                }
+    }
+}
+void View_LCD::print_lcd_24(ushort x,ushort y,const std::string& strIn, ushort width, unsigned char INVERT)
+{
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
+    if (width==MAX_WIDTH_LCD) width=columns_in_row;
+    if (width>columns_in_row) width=columns_in_row;
+     for(unsigned char i_lcd = 0; i_lcd < PART_COUNT24; i_lcd++)//Делаем в 3 прохода
+     {
+                //unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
+                ushort offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++             
+                
+                for(unsigned char pos_str=0;pos_str<strlen(str1);pos_str++)//проходим по всем символам строки
+                {
+                     unsigned char symbol=str1[pos_str];
+                     //if (symbol<32) symbol=0; else symbol-=32;
+                      for(int count = (Tahoma_24[symbol].sH.cyPix-1)*PART_COUNT24; count >= 0; count-=PART_COUNT24)
+                      {
+                         if (offset_x_buffer<width)//Лишнее обрезаем, т.е. не выводим на дисплей
+                         {
+                            //if ((offset_y_buffer+offset_x_buffer)<size_screen_buffer)//Чтобы не было ошибки при выводе ниже нижней границы экрана
+                            {
+                                //screen_buffer[offset_y_buffer+offset_x_buffer]=Tahoma_24[symbol].b[count+i_lcd];
+                                offset_x_buffer++;
+                            }
+                        }
+                          /* if (!INVERT)
+                           { 
+                              mI2CBus->write_to_buffer(Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                           else
+                           { 
+                              mI2CBus->write_to_buffer(~Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                         }*/
+                   }
+                }
+    }
+}
+void View_LCD::print_lcd_32(ushort x,ushort y,const std::string& strIn, ushort width, unsigned char INVERT)
+{
+    std::string strCP1251=recodeUTF8toCP1251(strIn);
+    const char* str1=strCP1251.c_str();
+    if (width==MAX_WIDTH_LCD) width=columns_in_row;
+    if (width>columns_in_row) width=columns_in_row;
+     for(unsigned char i_lcd = 0; i_lcd < PART_COUNT32; i_lcd++)//Делаем в 3 прохода
+     {
+                //unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
+                ushort offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++             
+                
+                for(unsigned char pos_str=0;pos_str<strlen(str1);pos_str++)//проходим по всем символам строки
+                {
+                     unsigned char symbol=str1[pos_str];
+                     //if (symbol<32) symbol=0; else symbol-=32;
+                      for(int count = (Tahoma_32[symbol].sH.cyPix-1)*PART_COUNT32; count >= 0; count-=PART_COUNT32)
+                      {
+                         if (offset_x_buffer<width)//Лишнее обрезаем, т.е. не выводим на дисплей
+                         {
+                            //if ((offset_y_buffer+offset_x_buffer)<size_screen_buffer)//Чтобы не было ошибки при выводе ниже нижней границы экрана
+                            {
+                                //screen_buffer[offset_y_buffer+offset_x_buffer]=Tahoma_32[symbol].b[count+i_lcd];
+                                offset_x_buffer++;
+                            }
+                        }
+                          /* if (!INVERT)
+                           { 
+                              mI2CBus->write_to_buffer(Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                           else
+                           { 
+                              mI2CBus->write_to_buffer(~Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                         }*/
+                   }
+                }
+    }
+}
+//<<<<< РИСОВАНИЕ СИМВОЛОВ
+
 
 LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast) : View_LCD(width_LCD,height_LCD/8)
 {
@@ -212,7 +506,7 @@ void LCD_TIC149::set_lcd_contrast(unsigned char lcd_k)
 		 mI2CBus->send_buffer();
 }
 
-void LCD_TIC149::clear_lcd_old()
+void LCD_TIC149::clear_lcd_hardware()
 {
 //очистка ОЗУ драйвера
         mI2CBus->write_to_buffer(0b00000000);         // control byte
@@ -389,90 +683,14 @@ const unsigned char LCD_TIC149::screen_logo[1064] = {
  ,  0 ,  0 ,  0 ,  0
  };
 
-//Black_New[Номер символа]
-//Black_New[pos_str].sH.cyPix;//Необходимое количество выводимых байт (т.е. 19-x)
-//Black_New[pos_str].b[];//Верхняя строка все нечётные - нижняя все чётные 
-   
-//Общий для всех шрифтов, сгенерированных LCDicon
-struct sHeader
-   {         
-		//flash char ccChar;              // optional char 
-		int cxPix;
-		int cyPix;
-   };
-
-template<int T>
-struct sUnitN {
-		sHeader sH;               // header 
-		unsigned char b[T];          // Data 
-};
-const int PART_COUNT8=1;
-const int PART_COUNT16=2;
-const int PART_COUNT24=3;
-const int PART_COUNT32=4;
-//Маскимальная длина символа высотой 24 - определять по программе - скорее всего буква Щ
-const int SYM_8_LONG=20;
-const int SYM_16_LONG=30;
-const int SYM_24_LONG=40;//28
-const int SYM_32_LONG=50;
-typedef sUnitN<SYM_8_LONG*PART_COUNT8> sUnit8;
-typedef sUnitN<SYM_16_LONG*PART_COUNT16> sUnit16;
-typedef sUnitN<SYM_24_LONG*PART_COUNT24> sUnit24;
-typedef sUnitN<SYM_32_LONG*PART_COUNT32> sUnit32;
-
-#include "Arial_8.h"
-#include "Tahoma_16.h"
-#include "Tahoma_24.h"
-#include "Tahoma_32.h"
-
-//Пример кода с http://programmersclub.ru/29/
-//Шаблоны функций класса http://msdn.microsoft.com/ru-ru/library/swta9c6e.aspx
-//http://valera.asf.ru/cpp/book/c10.html
-/*template<class T,class T1> void show_array( T *array,T1 count)
-{
-   T1 index;
-   for (index =0; index < count; index++) cout << array[index] “ ' ';
-   cout << endl;
-}
-
-void show_array(int *, int);
-
-void show_array(float *, unsigned);
-
-void main(void)
-
-{
-   int pages[] = { 100, 200, 300, 400, 500 };
-   float pricesH = { 10.05, 20.10, 30.15 };
-   show_array(pages, 5);
-   show_array(prices, 3);
-} */
-   
-/*template<typename T>
-class X
-{
-public:
-   template<typename U>
-   void mf(const U &u);
-};
-
-template<typename T> template <typename U>
-void X<T>::mf(const U &u)
-{
-}*/
-
-//PART_COUNT, Tahoma_24
-//x считается в пикелях
-//y в строках (каждая строка 8 бит (пикселей)
-
 //Шаблон должен принимать на вход массив экземпляторов классов и число проходов при рисовании
 //template <int PART_COUNTX, class[] Font>//,sUnit24 Tahoma_24
 //Вроде должно быть (offset_x_buffer<width) - проверить работу этого условия
-void LCD_TIC149::print_lcd_8_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_8_old(char x,char y,const std::string& strIn, ushort width, unsigned char INVERT)
 {
     std::string strCP1251=recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
-	if (width>=width_LCD) width=width_LCD;
+    if (width>width_LCD) width=width_LCD;
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT8; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -508,10 +726,11 @@ void LCD_TIC149::print_lcd_8_old(char x,char y,const std::string& strIn, int wid
                 }
 	}
 }
-void LCD_TIC149::print_lcd_16_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_16_old(char x,char y,const std::string& strIn, ushort width, unsigned char INVERT)
 {
     std::string strCP1251=recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
+    if (width>width_LCD) width=width_LCD;
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT16; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -544,10 +763,11 @@ void LCD_TIC149::print_lcd_16_old(char x,char y,const std::string& strIn, int wi
                 }
 	}
 }
-void LCD_TIC149::print_lcd_24_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_24_old(char x,char y,const std::string& strIn, ushort width, unsigned char INVERT)
 {
     std::string strCP1251=recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
+    if (width>width_LCD) width=width_LCD;
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT24; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -580,10 +800,11 @@ void LCD_TIC149::print_lcd_24_old(char x,char y,const std::string& strIn, int wi
                 }
 	}
 }
-void LCD_TIC149::print_lcd_32_old(char x,char y,const std::string& strIn, int width, unsigned char INVERT)
+void LCD_TIC149::print_lcd_32_old(char x,char y,const std::string& strIn, ushort width, unsigned char INVERT)
 {
     std::string strCP1251=recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
+    if (width>width_LCD) width=width_LCD;
      for(unsigned char i_lcd = 0; i_lcd < PART_COUNT32; i_lcd++)//Делаем в 3 прохода
      {
 				unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;

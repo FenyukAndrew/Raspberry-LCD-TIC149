@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	LCD_TIC149* mLCD_TIC149=new LCD_TIC149(&mI2CBus,61);
 	
 	//mLCD_TIC149->lcd_view_invert();
-	mLCD_TIC149->clear_lcd_old();
+	mLCD_TIC149->clear_lcd_hardware();
 	//mLCD_TIC149->lcd_screen_old();
 	
 	//mLCD_TIC149->lcd_rotate_180();

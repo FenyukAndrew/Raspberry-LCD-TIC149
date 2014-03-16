@@ -14,22 +14,24 @@ public:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <string>
 
 //Класс, содержащий одну строку
 class row_LCD
 {
 public:
-	row_LCD(const int _columns) : columns_in_row(_columns)
+	row_LCD(const ushort _columns) : columns_in_row(_columns)
 	{
 		data=new unsigned char[_columns];
 	};
 	~row_LCD() {delete[] data;printf("Destructor row_LCD\n");};
-	void write(const int column,const unsigned char value) 
+	void write(const ushort column,const unsigned char value) 
 	{
 		if (column<columns_in_row)
 			data[column]=value;
 	};
-	unsigned char read(const int column) const 
+	unsigned char read(const ushort column) const 
 	{
 		if (column<columns_in_row)
 			return data[column];
@@ -40,7 +42,14 @@ public:
 	{
 		return data;
 	}
-	void point(const int _column,const unsigned char _height,const unsigned char color=1)
+	void clear_row()
+	{
+		for(int i=0;i<columns_in_row;i++)
+		{
+			data[i]=0;
+		}
+	}
+	void point(const ushort _column,const unsigned char _height,const unsigned char color=1)
 	{
 		if (_column>=columns_in_row) return;//Нет такой колонки
 		if (_height>7) return;
@@ -54,7 +63,7 @@ public:
 		}
 	}
 private:
-	const int columns_in_row;//Лишние 4 байта для каждой строки
+	const ushort columns_in_row;//Лишние 4 байта для каждой строки
 	unsigned char* data;
 };
 
@@ -70,20 +79,31 @@ private:
 class View_LCD// : public ProtoView
 {
 public:
-	View_LCD(const int _columns,const int _rows);//height_LCD/8
+	View_LCD(const ushort _columns,const ushort _rows);//height_LCD/8
 	~View_LCD();
 
+	const static ushort MAX_WIDTH_LCD=0;//Для того, чтобы по умолчанию не вводить данные
 
-	void point(const int _column,const int _height,const unsigned char _color=1);
+	void clear_lcd();
 
-//Сюда перенести рисование текста	
+	void point(const ushort _column,const ushort _height,const unsigned char _color=1);
+
+//x считается в пикелях
+//y в строках (каждая строка 8 бит (пикселей)
+	void print_lcd_8(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char INVERT=0);
+	void print_lcd_16(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
+	void print_lcd_24(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
+	void print_lcd_32(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
+//Вывод на экран строки определённой ширины, если больше - то не выводятся
 
 	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
 	static std::string recodeUTF8toCP1251(const std::string& text);
 
 private:
-	const int rows_in_screen;
-	row_LCD** rows_LCD;//Указатель на массив указателей
+	const ushort rows_in_screen;//Высота экрана
+	const ushort columns_in_row;//Ширина экрана
+	//row_LCD** rows_LCD;//Указатель на массив указателей
+	std::vector<row_LCD*> rows_LCD;//Лучше использовать std::list
 };
 
 
@@ -95,8 +115,8 @@ public:
 	LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast);
 	~LCD_TIC149();
 
-	const static int width_LCD=133;
-	const static int height_LCD=64;
+	const static ushort width_LCD=133;
+	const static ushort height_LCD=64;
 	
 	void init_lcd(unsigned char contrast);
 	void lcd_view_invert();	
@@ -104,18 +124,18 @@ public:
 	void lcd_rotate_0();
 	void lcd_rotate_180();
 	void set_lcd_contrast(unsigned char lcd_k);
-	void clear_lcd_old();//Очищает только экран, а не массив
+	void clear_lcd_hardware();//Очищает только экран, а не массив
 	void lcd_screen_old();
 	
 	void lcd_screen_buffer_old();
-	void write_lcd_screen_buffer_old(int pos, unsigned char value) {screen_buffer[pos]=value;};
+	void write_lcd_screen_buffer_old(ushort pos, unsigned char value) {screen_buffer[pos]=value;};
 	
 //x считается в пикелях
 //y в строках (каждая строка 8 бит (пикселей)
-	void print_lcd_8_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_16_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_24_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
-	void print_lcd_32_old(char x,char y,const std::string& str1, int width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_8_old(char x,char y,const std::string& str1, ushort width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_16_old(char x,char y,const std::string& str1, ushort width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_24_old(char x,char y,const std::string& str1, ushort width=width_LCD, unsigned char INVERT=0);
+	void print_lcd_32_old(char x,char y,const std::string& str1, ushort width=width_LCD, unsigned char INVERT=0);
 //Вывод на экран строки определённой ширины, если больше - то не выводятся
 
 private:
@@ -123,7 +143,7 @@ private:
 
 	const static unsigned char screen_logo[1064];
 	
-	const static int size_screen_buffer=1064;
+	const static ushort size_screen_buffer=1064;
 	unsigned char screen_buffer[size_screen_buffer];
 
 };
