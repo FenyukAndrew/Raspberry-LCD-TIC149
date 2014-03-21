@@ -11,7 +11,7 @@
 
 #include "I2CBus.h"
 
-I2CBus::I2CBus(const char *fileName, unsigned char address)
+I2CBus::I2CBus(const char* const fileName, const unsigned char address)
 {
 	count=0;
 	
@@ -34,7 +34,7 @@ I2CBus::~I2CBus()
 	std::cout<<"Destructor I2CBus\n";
 }
 	
-void I2CBus::write_to_buffer(unsigned char byte)
+void I2CBus::write_to_buffer(const unsigned char byte)
 {
 	buf[count]=byte;
 	count++;

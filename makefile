@@ -9,14 +9,14 @@ OBJS = main.o I2CBus.o LCD_TIC149.o Weather.o
 
 prog: $(OBJS)
 	g++ -o prog $(OBJS)  -lcurl -ltinyxml
-main.o: main.cc
-	g++ -c main.cc
+main.o: main.cc 
+	g++ -c -std=c++11 main.cc -lgraph
 I2CBus.o: I2CBus.cc I2CBus.h
-	g++ -c I2CBus.cc I2CBus.h
+	g++ -c -std=c++11 I2CBus.cc I2CBus.h
 LCD_TIC149.o: LCD_TIC149.cc LCD_TIC149.h
-	g++ -c LCD_TIC149.cc LCD_TIC149.h
+	g++ -c -std=c++11 LCD_TIC149.cc LCD_TIC149.h
 Weather.o: Weather.cc Weather.h	
-	g++ -c Weather.cc Weather.h
+	g++ -c -std=c++11 Weather.cc Weather.h
 #$(ODIR)/%.o: %.cc 
 #    gcc -c $(INC) -o $@ $< $(CFLAGS) 
 # т.е. можно просто описать компиляцию всех файлов - без лишних проблем

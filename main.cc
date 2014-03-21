@@ -19,6 +19,32 @@
 
 int main(int argc, char *argv[])
 {
+	/*std::string str;
+	//for(short i=32;i<255;i++) str+=i;
+	str="РўРµСЃС‚РѕРІР°СЏ СЃС‚СЂРѕРєР°!Тестовая строка!";
+	std::cout << str << std::endl;
+    //Все символы <32 выводить пробел?
+
+	std::string str4=View_LCD::recodeUTF8toCP1251(str);
+	std::cout << str4 << std::endl;
+
+	std::string str5=View_LCD::iconv_recode("CP1251","UTF-8",str);;
+	std::cout << str5 << std::endl;*/
+
+	for(int a=0;a<32;a++)
+	{
+	for(int y=0;y<133/2;y++)
+	{
+		std::cout << "▀ ";
+		//std::cout << "█ ";//▌▐";//y%10;
+		//std::cout << "▌";//▌▐";//y%10;
+	}
+	std::cout << std::endl;
+	}
+	//Возврат к началу экрана
+	//CSI n F 	CPL – Cursor Previous Line 	Перемещает курсор в начало n-ой (по умолчанию 1-ой) строки сверху относительно текущей.
+	std::cout << "\x1B[32F" << "*Currect position*" << std::endl;
+	//std::cout << "\x1b[3m"; Цвет не прошел
 
 	Weather m_Weather("http://export.yandex.ru/weather-ng/forecasts/34929.xml");
     std::cout << m_Weather.get_weather("temperature") << std::endl;

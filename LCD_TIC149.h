@@ -17,6 +17,8 @@ public:
 #include <vector>
 #include <string>
 
+constexpr unsigned char DEFAULT_COLOR=1;
+
 //Класс, содержащий одну строку
 class row_LCD
 {
@@ -25,7 +27,11 @@ public:
 	{
 		data=new unsigned char[_columns];
 	};
-	~row_LCD() {delete[] data;printf("Destructor row_LCD\n");};
+	~row_LCD() 
+	{
+		delete[] data;
+		//printf("Destructor row_LCD\n");
+	};
 	void write(const ushort column,const unsigned char value) 
 	{
 		if (column<columns_in_row)
@@ -49,7 +55,7 @@ public:
 			data[i]=0;
 		}
 	}
-	void point(const ushort _column,const unsigned char _height,const unsigned char color=1)
+	void point(const ushort _column,const unsigned char _height,const unsigned char color=DEFAULT_COLOR)
 	{
 		if (_column>=columns_in_row) return;//Нет такой колонки
 		if (_height>7) return;
@@ -67,6 +73,44 @@ private:
 	unsigned char* data;
 };
 
+class View_LCD;
+
+//Универсальная структура данных для всех шрифтов
+struct sSymbol {
+		ushort width;
+        const unsigned char* b;          // Data
+
+        void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char value_PART_COUNT,const unsigned char color=DEFAULT_COLOR) const//Символ рисует сам себя
+        {
+        	//void View_LCD::write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data)
+
+        };
+};
+//Символ должен уметь рисовать себя
+//Также можно будет вывод символа сделать по точным координатам - т.е. реализовать смещение и ИЛИ
+
+class Font
+{
+public:
+  Font(const unsigned char PART_COUNT) : value_PART_COUNT(PART_COUNT)
+  {};
+
+  ushort get_width_symbol(const unsigned char code_symbol) const 
+  {
+  	return p_Font[code_symbol].width;
+  };
+  void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char code_symbol,const unsigned char color=DEFAULT_COLOR) const //Рисование символа
+  {
+  	 p_Font[code_symbol].DrawTo(x,y,m_View_LCD,value_PART_COUNT,color);
+  };
+
+//private:
+  sSymbol p_Font[256];
+  //Может лучше массив указателей? тогда и инициализацию проще сделать
+private:
+  const unsigned char value_PART_COUNT;
+};
+
 
 //        columns (x)
 //        0123456 .. 133
@@ -82,19 +126,31 @@ public:
 	View_LCD(const ushort _columns,const ushort _rows);//height_LCD/8
 	~View_LCD();
 
-	const static ushort MAX_WIDTH_LCD=0;//Для того, чтобы по умолчанию не вводить данные
+	constexpr static ushort MAX_WIDTH_LCD=0;//Для того, чтобы по умолчанию не вводить данные - можно сделать #FFFF
 
 	void clear_lcd();
 
 	void point(const ushort _column,const ushort _height,const unsigned char _color=1);
+	void write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data);//Для вывода теста
+
+	enum class e_font_height : char {size_8, size_16, size_24, size_32};
+//По идее должна быть одна функция print_lcd с выбором шрифта из enum
+	void print_lcd(const ushort x,const ushort y,const std::string& strIn, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
+//Лучше словарь, в котором производить регистрцию загружаемых шрифтов
+//Фабрики - может в этом случае поможет?
 
 //x считается в пикелях
 //y в строках (каждая строка 8 бит (пикселей)
-	void print_lcd_8(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char INVERT=0);
-	void print_lcd_16(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
-	void print_lcd_24(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
-	void print_lcd_32(ushort x,ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, unsigned char INVERT=0);
+	void print_lcd_8(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
+	void print_lcd_16(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
+	void print_lcd_24(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
+	void print_lcd_32(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
 //Вывод на экран строки определённой ширины, если больше - то не выводятся
+
+
+	void print_lcd_XX(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char color,const Font& m_Font);
+
+    void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char color=DEFAULT_COLOR);//Отображение сам себя в другой видовой экран
 
 	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
 	static std::string recodeUTF8toCP1251(const std::string& text);
@@ -112,7 +168,7 @@ private:
 class LCD_TIC149 : public View_LCD
 {
 public:
-	LCD_TIC149(I2CBus* m_I2CBus,unsigned char contrast);
+	LCD_TIC149(I2CBus* m_I2CBus,const unsigned char contrast);
 	~LCD_TIC149();
 
 	const static ushort width_LCD=133;
@@ -123,12 +179,13 @@ public:
 	void lcd_view_normal();
 	void lcd_rotate_0();
 	void lcd_rotate_180();
-	void set_lcd_contrast(unsigned char lcd_k);
+	void set_lcd_contrast(const unsigned char lcd_k);
 	void clear_lcd_hardware();//Очищает только экран, а не массив
 	void lcd_screen_old();
 	
+	void lcd_screen_buffer();//Работает с новым экранным буфером
 	void lcd_screen_buffer_old();
-	void write_lcd_screen_buffer_old(ushort pos, unsigned char value) {screen_buffer[pos]=value;};
+	void write_lcd_screen_buffer_old(const ushort pos, const unsigned char value) {screen_buffer[pos]=value;};
 	
 //x считается в пикелях
 //y в строках (каждая строка 8 бит (пикселей)
@@ -143,7 +200,7 @@ private:
 
 	const static unsigned char screen_logo[1064];
 	
-	const static ushort size_screen_buffer=1064;
+	constexpr static ushort size_screen_buffer=1064;
 	unsigned char screen_buffer[size_screen_buffer];
 
 };

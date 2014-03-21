@@ -1,10 +1,10 @@
 class I2CBus
 {
 public:
-	I2CBus(const char *fileName, unsigned char address);
+	I2CBus(const char* const fileName, const unsigned char address);
 	~I2CBus();
 	
-	void write_to_buffer(unsigned char byte);
+	void write_to_buffer(const unsigned char byte);
 	void send_buffer();
 
 	
