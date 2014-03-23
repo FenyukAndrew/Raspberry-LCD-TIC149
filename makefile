@@ -10,7 +10,7 @@ OBJS = main.o I2CBus.o LCD_TIC149.o Weather.o
 prog: $(OBJS)
 	g++ -o prog $(OBJS)  -lcurl -ltinyxml
 main.o: main.cc 
-	g++ -c -std=c++11 main.cc -lgraph
+	g++ -c -std=c++11 main.cc
 I2CBus.o: I2CBus.cc I2CBus.h
 	g++ -c -std=c++11 I2CBus.cc I2CBus.h
 LCD_TIC149.o: LCD_TIC149.cc LCD_TIC149.h

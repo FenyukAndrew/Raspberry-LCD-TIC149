@@ -53,6 +53,32 @@ Font font_Tahoma_16(PART_COUNT16);
 Font font_Tahoma_24(PART_COUNT24);
 Font font_Tahoma_32(PART_COUNT32);
 
+        void sSymbol::DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char value_PART_COUNT,const unsigned char color) const
+        {
+        for(unsigned char i_lcd = 0; i_lcd < value_PART_COUNT; i_lcd++)//Делаем в несколько проходов
+        {
+                ushort offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++             
+                for(int count = (width-1)*value_PART_COUNT; count >= 0; count-=value_PART_COUNT)
+                {
+                    //(rows_LCD[y+i_lcd])->write(offset_x_buffer,b[count+i_lcd]);
+                    m_View_LCD.write_byte_to_buffer(offset_x_buffer,y+i_lcd,b[count+i_lcd]);
+                    offset_x_buffer++;
+                }
+            }
+                /*while ((++pos_lcd)<=133)
+                {    
+                           if (!INVERT)
+                           { 
+                              mI2CBus->write_to_buffer(Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                           else
+                           { 
+                              mI2CBus->write_to_buffer(~Black_New_24[symbol].b[count+i_lcd]);
+                           }
+                         }
+                }*/
+        };
+
 View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)//height_LCD/8
 {
     rows_LCD.reserve(_rows);
@@ -320,6 +346,36 @@ void View_LCD::print_lcd_24(const ushort x,const ushort y,const std::string& str
 void View_LCD::print_lcd_32(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char _color)
 {
   print_lcd_XX(x,y,strIn,width,_color,font_Tahoma_32);
+}
+
+void View_LCD::print_lcd(const e_font_height _font_height,const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char _color)
+{
+  switch(_font_height)
+  {
+    case e_font_height::size_8:
+      print_lcd_XX(x,y,strIn,width,_color,font_Arial_8);
+    break;
+    case e_font_height::size_16:
+      print_lcd_XX(x,y,strIn,width,_color,font_Tahoma_16);
+    break;
+    case e_font_height::size_24:
+      print_lcd_XX(x,y,strIn,width,_color,font_Tahoma_24);
+    break;
+    case e_font_height::size_32:
+      print_lcd_XX(x,y,strIn,width,_color,font_Tahoma_32);
+    break;
+    default:
+    break;
+  }
+}
+
+void View_LCD::Debug_output_console()
+{
+    for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    {
+        (*it)->Debug_output_console();
+    }
+
 }
 //<<<<< РИСОВАНИЕ СИМВОЛОВ
 

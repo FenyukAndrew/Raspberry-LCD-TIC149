@@ -34,15 +34,21 @@ public:
 	};
 	void write(const ushort column,const unsigned char value) 
 	{
-		if (column<columns_in_row)
+		if (column<columns_in_row)//Проверить - сколько надо строк - может быть <=
+		{
 			data[column]=value;
+		}
 	};
 	unsigned char read(const ushort column) const 
 	{
 		if (column<columns_in_row)
+		{
 			return data[column];
+		}
 		else
+		{
 			return 0;
+		}
 	};
 	unsigned char* get_row() const
 	{
@@ -50,7 +56,7 @@ public:
 	}
 	void clear_row()
 	{
-		for(int i=0;i<columns_in_row;i++)
+		for(ushort i=0;i<columns_in_row;i++)
 		{
 			data[i]=0;
 		}
@@ -68,6 +74,29 @@ public:
 			data[_column]&=~(1<<_height);//Может оказаться (7-_height)
 		}
 	}
+    void Debug_output_console()
+    {
+    	unsigned char symbols[]="▀▄█ ";
+    	//Т.к. строка 8 пикселей в высоту, для печати используются 4 символа: ▀▄█ 
+    	//Для буферизации используем 4 строки
+    	std::string str1[4];
+		 	for(unsigned char y=0;y<4;y++)
+		 	{
+		 		str1[y].resize(columns_in_row, ' ');
+		 	}
+
+		for(ushort i=0;i<columns_in_row;i++)
+		{
+		 	unsigned char b=data[i];
+		 	for(unsigned char y=0;y<4;y++)
+		 	{
+		 		unsigned char z=b&0b00000011;
+		 		b<<=2;
+		 		
+		 	}
+		}
+    }
+
 private:
 	const ushort columns_in_row;//Лишние 4 байта для каждой строки
 	unsigned char* data;
@@ -76,15 +105,13 @@ private:
 class View_LCD;
 
 //Универсальная структура данных для всех шрифтов
-struct sSymbol {
+struct sSymbol 
+{
 		ushort width;
         const unsigned char* b;          // Data
 
-        void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char value_PART_COUNT,const unsigned char color=DEFAULT_COLOR) const//Символ рисует сам себя
-        {
-        	//void View_LCD::write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data)
-
-        };
+//Символ рисует сам себя
+        void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char value_PART_COUNT,const unsigned char color=DEFAULT_COLOR) const;
 };
 //Символ должен уметь рисовать себя
 //Также можно будет вывод символа сделать по точным координатам - т.е. реализовать смещение и ИЛИ
@@ -133,9 +160,6 @@ public:
 	void point(const ushort _column,const ushort _height,const unsigned char _color=1);
 	void write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data);//Для вывода теста
 
-	enum class e_font_height : char {size_8, size_16, size_24, size_32};
-//По идее должна быть одна функция print_lcd с выбором шрифта из enum
-	void print_lcd(const ushort x,const ushort y,const std::string& strIn, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
 //Лучше словарь, в котором производить регистрцию загружаемых шрифтов
 //Фабрики - может в этом случае поможет?
 
@@ -147,10 +171,12 @@ public:
 	void print_lcd_32(const ushort x,const ushort y,const std::string& str1, ushort width=MAX_WIDTH_LCD, const unsigned char color=DEFAULT_COLOR);
 //Вывод на экран строки определённой ширины, если больше - то не выводятся
 
-
-	void print_lcd_XX(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char color,const Font& m_Font);
+	enum class e_font_height : char {size_8, size_16, size_24, size_32};
+	void print_lcd(const e_font_height _font_height,const ushort x,const ushort y,const std::string& strIn, ushort width=MAX_WIDTH_LCD, const unsigned char _color=DEFAULT_COLOR);
 
     void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char color=DEFAULT_COLOR);//Отображение сам себя в другой видовой экран
+
+    void Debug_output_console();
 
 	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
 	static std::string recodeUTF8toCP1251(const std::string& text);
@@ -160,6 +186,8 @@ private:
 	const ushort columns_in_row;//Ширина экрана
 	//row_LCD** rows_LCD;//Указатель на массив указателей
 	std::vector<row_LCD*> rows_LCD;//Лучше использовать std::list
+
+	void print_lcd_XX(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char color,const Font& m_Font);
 };
 
 
