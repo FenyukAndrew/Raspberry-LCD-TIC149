@@ -79,17 +79,76 @@ Font font_Tahoma_32(PART_COUNT32);
                 }*/
         };
 
-View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)//height_LCD/8
+    void Row_LCD::debug_output_console()
+    {
+      //Не работает как надо
+      //Должен быть другой массив - т.к. UTF-8
+      //std::string symbols[]=" ▄▀█";// =0 ▄=1 ▀=2 █=3
+      //Т.к. строка 8 пикселей в высоту, для печати используются 4 символа: ▀▄█  
+      //Для буферизации используем 4 строки
+      std::string str1[4];
+    for(unsigned char y=0;y<4;y++)
+    {
+      //str1[y].resize(columns_in_row, ' ');
+      //str1[y].capacity((int)columns_in_row);
+      //str1[4]=std::string(columns_in_row, ' ');
+    }
+
+    for(ushort i=0;i<columns_in_row;i++)
+    {
+      unsigned char b=data[i];
+      for(unsigned char y=0;y<4;y++)
+      {
+        unsigned char z=b&0b00000011;
+        b>>=2;
+        //str1[y][i]=symbols[z];//Нужен имеенно append - т.к. используются многобайтовые символы
+        switch(z)
+        {
+          case 0:
+            str1[y].append(" ");
+          break;
+          case 1:
+            str1[y].append("▄");
+          break;
+          case 2:
+            str1[y].append("▀");
+          break;
+          case 3:
+            str1[y].append("█");
+          break;
+        }
+      }
+    }
+    for(unsigned char y=0;y<4;y++)
+    {
+      std::cout<<"="<<str1[y]<<std::endl;
+    }
+
+    }
+
+    void Row_LCD::save_to_bmp(BMP& AnImage)
+    {
+      for(ushort i=0;i<columns_in_row;i++)
+      {
+        AnImage(i,i)->Red = 255;
+        AnImage(i,i)->Green = 0;
+        AnImage(i,i)->Blue = 0;
+        AnImage(i,i)->Alpha = 0;
+      }
+
+    }
+
+    View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)//height_LCD/8
 {
     rows_LCD.reserve(_rows);
     for(int i=0;i<_rows;i++)
     {
-        rows_LCD.push_back(new row_LCD(_columns));
+        rows_LCD.push_back(new Row_LCD(_columns));
     }
-    /*rows_LCD=new row_LCD*[_rows];
+    /*rows_LCD=new Row_LCD*[_rows];
     for(int i=0;i<_rows;i++)
     {
-        rows_LCD[i]=new row_LCD(_columns);
+        rows_LCD[i]=new Row_LCD(_columns);
     }*/
 
     //Приведение формата шрифтов - в цикле, потому что разные типы входных данных
@@ -111,7 +170,7 @@ View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_r
 }
 View_LCD::~View_LCD() 
 {
-    //for (std::vector<row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    //for (std::vector<Row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
     for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
     {
         //it->~row_LCD();
@@ -129,7 +188,7 @@ View_LCD::~View_LCD()
 
 void View_LCD::clear_lcd()
 {
-    for (std::vector<row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    for (std::vector<Row_LCD*>::iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
     {
         (*it)->clear_row();
     }
@@ -369,14 +428,23 @@ void View_LCD::print_lcd(const e_font_height _font_height,const ushort x,const u
   }
 }
 
-void View_LCD::Debug_output_console()
+void View_LCD::debug_output_console()
 {
     for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
     {
-        (*it)->Debug_output_console();
+        (*it)->debug_output_console();
     }
-
 }
+
+void View_LCD::save_to_bmp(BMP& AnImage)
+{
+    AnImage.SetSize(133,64);
+    for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    {
+        (*it)->save_to_bmp(AnImage);
+    }
+}
+
 //<<<<< РИСОВАНИЕ СИМВОЛОВ
 
 LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,const unsigned char contrast) : View_LCD(width_LCD,height_LCD/8)

@@ -107,6 +107,21 @@ http://en.wikipedia.org/wiki/ANSI_escape_code
 Решение: т.к. шрифты уже сгенерированы и проверены на экране - использовать их
 Загрузку организовать в виду синглтон объекта
 
+Лучше Debug делать в BMP файл
+http://easybmp.sourceforge.net/
+
+BMP AnImage;
+AnImage.SetSize(133,64);
+AnImage.SetBitDepth(24);
+
+for(ushort i=0;i<64;i++)
+{
+AnImage(i,i)->Red = 255;
+AnImage(i,i)->Green = 0;
+AnImage(i,i)->Blue = 0;
+AnImage(i,i)->Alpha = 0;
+}
+
 ***** СТАРОЕ
 
 Компиляция одного файла

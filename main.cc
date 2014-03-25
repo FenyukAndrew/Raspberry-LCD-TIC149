@@ -14,8 +14,7 @@
 #include "LCD_TIC149.h"
 #include "Weather.h"
 
-
- 
+#include "EasyBMP/EasyBMP.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,7 +30,7 @@ int main(int argc, char *argv[])
 	std::string str5=View_LCD::iconv_recode("CP1251","UTF-8",str);;
 	std::cout << str5 << std::endl;*/
 
-	for(int a=0;a<32;a++)
+	/*for(int a=0;a<32;a++)
 	{
 	for(int y=0;y<133/2;y++)
 	{
@@ -40,17 +39,25 @@ int main(int argc, char *argv[])
 		//std::cout << "▌";//▌▐";//y%10;
 	}
 	std::cout << std::endl;
-	}
+	}*/
 	//Возврат к началу экрана
 	//CSI n F 	CPL – Cursor Previous Line 	Перемещает курсор в начало n-ой (по умолчанию 1-ой) строки сверху относительно текущей.
-	std::cout << "\x1B[32F" << "*Currect position*" << std::endl;
+	//std::cout << "\x1B[32F" << "*Currect position*" << std::endl;
 	//std::cout << "\x1b[3m"; Цвет не прошел
 
 	Weather m_Weather("http://export.yandex.ru/weather-ng/forecasts/34929.xml");
     std::cout << m_Weather.get_weather("temperature") << std::endl;
     std::cout << m_Weather.get_weather("weather_type") << std::endl;
 
+	BMP AnImage;
+	//AnImage.SetSize(133,64);
+	AnImage.SetBitDepth(24);
+
     View_LCD* m_View_LCD=new View_LCD(64/8,133);
+    m_View_LCD->print_lcd_16(0,0,"1");
+    m_View_LCD->save_to_bmp(AnImage);
+    //m_View_LCD->debug_output_console();
+	AnImage.WriteToFile("Output.bmp");	
     delete m_View_LCD;
 
 	I2CBus mI2CBus("/dev/i2c-1",0x3c);

@@ -17,17 +17,19 @@ public:
 #include <vector>
 #include <string>
 
+#include "EasyBMP/EasyBMP.h"
+
 constexpr unsigned char DEFAULT_COLOR=1;
 
 //Класс, содержащий одну строку
-class row_LCD
+class Row_LCD
 {
 public:
-	row_LCD(const ushort _columns) : columns_in_row(_columns)
+	Row_LCD(const ushort _columns) : columns_in_row(_columns)
 	{
 		data=new unsigned char[_columns];
 	};
-	~row_LCD() 
+	~Row_LCD() 
 	{
 		delete[] data;
 		//printf("Destructor row_LCD\n");
@@ -74,31 +76,11 @@ public:
 			data[_column]&=~(1<<_height);//Может оказаться (7-_height)
 		}
 	}
-    void Debug_output_console()
-    {
-    	unsigned char symbols[]="▀▄█ ";
-    	//Т.к. строка 8 пикселей в высоту, для печати используются 4 символа: ▀▄█ 
-    	//Для буферизации используем 4 строки
-    	std::string str1[4];
-		 	for(unsigned char y=0;y<4;y++)
-		 	{
-		 		str1[y].resize(columns_in_row, ' ');
-		 	}
-
-		for(ushort i=0;i<columns_in_row;i++)
-		{
-		 	unsigned char b=data[i];
-		 	for(unsigned char y=0;y<4;y++)
-		 	{
-		 		unsigned char z=b&0b00000011;
-		 		b<<=2;
-		 		
-		 	}
-		}
-    }
+	void debug_output_console();
+    void save_to_bmp(BMP& AnImage);
 
 private:
-	const ushort columns_in_row;//Лишние 4 байта для каждой строки
+	const ushort columns_in_row;//Лишние 2 байта для каждой строки
 	unsigned char* data;
 };
 
@@ -174,9 +156,10 @@ public:
 	enum class e_font_height : char {size_8, size_16, size_24, size_32};
 	void print_lcd(const e_font_height _font_height,const ushort x,const ushort y,const std::string& strIn, ushort width=MAX_WIDTH_LCD, const unsigned char _color=DEFAULT_COLOR);
 
-    void DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char color=DEFAULT_COLOR);//Отображение сам себя в другой видовой экран
+    void drawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char color=DEFAULT_COLOR);//Отображение сам себя в другой видовой экран
 
-    void Debug_output_console();
+    void debug_output_console();
+    void save_to_bmp(BMP& AnImage);
 
 	static std::string iconv_recode(const std::string& from, const std::string& to, std::string text);
 	static std::string recodeUTF8toCP1251(const std::string& text);
@@ -184,8 +167,8 @@ public:
 private:
 	const ushort rows_in_screen;//Высота экрана
 	const ushort columns_in_row;//Ширина экрана
-	//row_LCD** rows_LCD;//Указатель на массив указателей
-	std::vector<row_LCD*> rows_LCD;//Лучше использовать std::list
+	//Row_LCD** rows_LCD;//Указатель на массив указателей
+	std::vector<Row_LCD*> rows_LCD;//Лучше использовать std::list
 
 	void print_lcd_XX(const ushort x,const ushort y,const std::string& strIn, ushort width, const unsigned char color,const Font& m_Font);
 };
