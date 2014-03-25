@@ -53,8 +53,25 @@ int main(int argc, char *argv[])
 	//AnImage.SetSize(133,64);
 	AnImage.SetBitDepth(24);
 
-    View_LCD* m_View_LCD=new View_LCD(64/8,133);
-    m_View_LCD->print_lcd_16(0,0,"1");
+    View_LCD* m_View_LCD=new View_LCD(133,64);
+
+    //Очистка экрана
+    for(ushort x=0;x<133;x++)
+    {
+    	for(ushort y=0;y<64;y++)
+    	{
+    		m_View_LCD->point(x,y,0);
+    	}
+    }
+
+    for(ushort y=0;y<64;y++)
+    {
+    	m_View_LCD->point(y,y);
+    }
+    //m_View_LCD->print_lcd_8(0,0,"1234567890");
+    m_View_LCD->print_lcd_16(0,0,"1as");
+    //m_View_LCD->print_lcd_24(0,0,"1DFG");
+
     m_View_LCD->save_to_bmp(AnImage);
     //m_View_LCD->debug_output_console();
 	AnImage.WriteToFile("Output.bmp");	

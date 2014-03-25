@@ -63,7 +63,7 @@ public:
 			data[i]=0;
 		}
 	}
-	void point(const ushort _column,const unsigned char _height,const unsigned char color=DEFAULT_COLOR)
+	/*void point(const ushort _column,const unsigned char _height,const unsigned char color=DEFAULT_COLOR)
 	{
 		if (_column>=columns_in_row) return;//Нет такой колонки
 		if (_height>7) return;
@@ -75,9 +75,14 @@ public:
 		{
 			data[_column]&=~(1<<_height);//Может оказаться (7-_height)
 		}
+	}*/
+	void point(const ushort _column,const unsigned char color=DEFAULT_COLOR)
+	{
+		if (_column>=columns_in_row) return;//Нет такой колонки
+		data[_column]=color;
 	}
 	void debug_output_console();
-    void save_to_bmp(BMP& AnImage);
+    void save_to_bmp(const ushort y,BMP& AnImage);
 
 private:
 	const ushort columns_in_row;//Лишние 2 байта для каждой строки
@@ -132,14 +137,14 @@ private:
 class View_LCD// : public ProtoView
 {
 public:
-	View_LCD(const ushort _columns,const ushort _rows);//height_LCD/8
+	View_LCD(const ushort _columns,const ushort _rows);
 	~View_LCD();
 
 	constexpr static ushort MAX_WIDTH_LCD=0;//Для того, чтобы по умолчанию не вводить данные - можно сделать #FFFF
 
 	void clear_lcd();
 
-	void point(const ushort _column,const ushort _height,const unsigned char _color=1);
+	void point(const ushort _column,const ushort _height,const unsigned char _color=DEFAULT_COLOR);
 	void write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data);//Для вывода теста
 
 //Лучше словарь, в котором производить регистрцию загружаемых шрифтов

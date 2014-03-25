@@ -53,6 +53,7 @@ Font font_Tahoma_16(PART_COUNT16);
 Font font_Tahoma_24(PART_COUNT24);
 Font font_Tahoma_32(PART_COUNT32);
 
+//Рисование - указывается верхний левый угол текста
         void sSymbol::DrawTo(const ushort x,const ushort y,View_LCD& m_View_LCD,const unsigned char value_PART_COUNT,const unsigned char color) const
         {
         for(unsigned char i_lcd = 0; i_lcd < value_PART_COUNT; i_lcd++)//Делаем в несколько проходов
@@ -61,7 +62,13 @@ Font font_Tahoma_32(PART_COUNT32);
                 for(int count = (width-1)*value_PART_COUNT; count >= 0; count-=value_PART_COUNT)
                 {
                     //(rows_LCD[y+i_lcd])->write(offset_x_buffer,b[count+i_lcd]);
-                    m_View_LCD.write_byte_to_buffer(offset_x_buffer,y+i_lcd,b[count+i_lcd]);
+                    //m_View_LCD.write_byte_to_buffer(offset_x_buffer,y+i_lcd,b[count+i_lcd]);
+                    for(unsigned char _bit=0;_bit<=7;_bit++)
+                    {
+                      unsigned char _c=((b[count+i_lcd]&(1<<_bit))!=0) ? DEFAULT_COLOR : 0;
+                      m_View_LCD.point(offset_x_buffer,y+i_lcd*8+7-_bit,_c);
+                    }
+
                     offset_x_buffer++;
                 }
             }
@@ -126,19 +133,26 @@ Font font_Tahoma_32(PART_COUNT32);
 
     }
 
-    void Row_LCD::save_to_bmp(BMP& AnImage)
+    void Row_LCD::save_to_bmp(const ushort y,BMP& AnImage)
     {
-      for(ushort i=0;i<columns_in_row;i++)
+      for(ushort x=0;x<columns_in_row;x++)
       {
-        AnImage(i,i)->Red = 255;
-        AnImage(i,i)->Green = 0;
-        AnImage(i,i)->Blue = 0;
-        AnImage(i,i)->Alpha = 0;
+        /*for(unsigned char i=0;i<=7;i++)
+        {
+          if ((data[x]&(1<<i))!=0)
+          {*/
+          if (data[x]!=0)
+          {
+            AnImage(x,y)->Red = 255;
+            AnImage(x,y)->Green = 0;
+            AnImage(x,y)->Blue = 0;
+            AnImage(x,y)->Alpha = 0;
+          }
       }
 
     }
 
-    View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)//height_LCD/8
+    View_LCD::View_LCD(const ushort _columns,const ushort _rows) : rows_in_screen(_rows), columns_in_row(_columns)
 {
     rows_LCD.reserve(_rows);
     for(int i=0;i<_rows;i++)
@@ -196,9 +210,14 @@ void View_LCD::clear_lcd()
 
 void View_LCD::point(const ushort _column,const ushort _height,const unsigned char _color)
 {
-    int _rows=_height/8;
+    /*int _rows=_height/8;
     if (_rows>=rows_in_screen) return;//Нет такой строки
-    rows_LCD[_rows]->point(_column,_height % 8,_color);
+    rows_LCD[_rows]->point(_column,_height % 8,_color);*/
+    //if (_rows>=rows_in_screen) return;//Нет такой строки
+    //rows_LCD[_rows]->point(_column,_height,_color);
+
+    if (_height>=rows_in_screen) return;//Нет такой строки
+    rows_LCD[_height]->point(_column,_color);
 }
 
 void View_LCD::write_byte_to_buffer(const ushort _column,const ushort _rows,const unsigned char _data)
@@ -438,16 +457,17 @@ void View_LCD::debug_output_console()
 
 void View_LCD::save_to_bmp(BMP& AnImage)
 {
-    AnImage.SetSize(133,64);
-    for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    AnImage.SetSize(columns_in_row,rows_in_screen);
+    ushort y=0;
+    for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it, y++)
     {
-        (*it)->save_to_bmp(AnImage);
+        (*it)->save_to_bmp(y,AnImage);
     }
 }
 
 //<<<<< РИСОВАНИЕ СИМВОЛОВ
 
-LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,const unsigned char contrast) : View_LCD(width_LCD,height_LCD/8)
+LCD_TIC149::LCD_TIC149(I2CBus* m_I2CBus,const unsigned char contrast) : View_LCD(width_LCD,height_LCD)
 {
 	mI2CBus=m_I2CBus;
 	init_lcd(contrast);
