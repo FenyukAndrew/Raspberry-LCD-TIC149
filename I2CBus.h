@@ -7,8 +7,6 @@ public:
 	void write_to_buffer(const unsigned char byte);
 	void send_buffer();
 
-	
-	
 //Возможна проблема - перед использованием буфер не очищается = в нём могут остаться из-за ошибки неиспользованные байты
 	
 private:
