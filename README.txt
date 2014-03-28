@@ -216,6 +216,9 @@ http://rus-linux.net/lib.php?name=/MyLDP/sys-conf/fonts.html
 #include "sSymbol.h"
 //class sSymbol;
 
+Проблема в том, что надпись только поднимается, но не опускается возможно в типах данных
+не было прописанно по умолчанию signed char
+
 
 
 ***** СТАРОЕ
