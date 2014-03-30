@@ -5,4 +5,10 @@
 
 constexpr unsigned char DEFAULT_COLOR=1;
 
+//Возможные типы высот шрифтов
+enum class Fnt : char
+{
+    h8, h16, h24, h32
+};
+
 #endif

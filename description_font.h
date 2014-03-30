@@ -1,18 +1,18 @@
-
 #ifndef HEADER_FONTS
 #define HEADER_FONTS 1
 //Общий для всех шрифтов, сгенерированных LCDicon
 struct sHeader
-   {         
-        //const char ccChar;              // optional char - Номер символа
-        const int cxPix;//Повторяется для всех символов
-        const int cyPix;//Необходимое количество выводимых байт (т.е. 19-x)
-   };
+{
+    //const char ccChar;              // optional char - Номер символа
+    const int cxPix;//Повторяется для всех символов
+    const int cyPix;//Необходимое количество выводимых байт (т.е. 19-x)
+};
 
 template<int T>
-struct sUnitN {
-        const sHeader sH;               // header 
-        const unsigned char b[T];          // Data - Верхняя строка все нечётные - нижняя все чётные 
+struct sUnitN
+{
+    const sHeader sH;               // header
+    const unsigned char b[T];          // Data - Верхняя строка все нечётные - нижняя все чётные
 };
 constexpr unsigned char PART_COUNT8=1;
 constexpr unsigned char PART_COUNT16=2;
