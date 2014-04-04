@@ -3,6 +3,8 @@
 #define LIB_FONTS_H
 
 #include <map>
+#include <string>
+
 #include "common_header.h"
 
 //#include "Singleton.h"

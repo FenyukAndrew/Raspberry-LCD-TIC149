@@ -4,11 +4,11 @@
 	<File name="EasyBMP/EasyBMP.cc" open="0" top="0" tabpos="25">
 		<Cursor position="25576" topLine="978" />
 	</File>
-	<File name="Font.cc" open="0" top="0" tabpos="6">
-		<Cursor position="0" topLine="0" />
+	<File name="Font.cc" open="1" top="0" tabpos="8">
+		<Cursor position="193" topLine="0" />
 	</File>
-	<File name="Font.h" open="1" top="0" tabpos="3">
-		<Cursor position="322" topLine="8" />
+	<File name="Font.h" open="1" top="1" tabpos="9">
+		<Cursor position="245" topLine="0" />
 	</File>
 	<File name="I2CBus.cc" open="0" top="0" tabpos="7">
 		<Cursor position="941" topLine="9" />
@@ -31,8 +31,8 @@
 	<File name="Lib_Fonts.cc" open="1" top="0" tabpos="1">
 		<Cursor position="1116" topLine="0" />
 	</File>
-	<File name="Lib_Fonts.h" open="1" top="0" tabpos="5">
-		<Cursor position="600" topLine="6" />
+	<File name="Lib_Fonts.h" open="1" top="0" tabpos="4">
+		<Cursor position="131" topLine="0" />
 	</File>
 	<File name="README.txt" open="0" top="0" tabpos="24">
 		<Cursor position="12494" topLine="148" />
@@ -55,7 +55,7 @@
 	<File name="Utils.h" open="0" top="0" tabpos="19">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="View_LCD.cc" open="1" top="1" tabpos="6">
+	<File name="View_LCD.cc" open="1" top="0" tabpos="5">
 		<Cursor position="3095" topLine="67" />
 	</File>
 	<File name="View_LCD.h" open="0" top="0" tabpos="20">
@@ -73,16 +73,16 @@
 	<File name="description_font.h" open="0" top="0" tabpos="22">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="main.cc" open="1" top="0" tabpos="8">
-		<Cursor position="2155" topLine="61" />
+	<File name="main.cc" open="1" top="0" tabpos="7">
+		<Cursor position="2155" topLine="102" />
 	</File>
 	<File name="makefile" open="0" top="0" tabpos="0">
 		<Cursor position="1788" topLine="0" />
 	</File>
-	<File name="sSymbol.cc" open="1" top="0" tabpos="7">
+	<File name="sSymbol.cc" open="1" top="0" tabpos="6">
 		<Cursor position="1175" topLine="0" />
 	</File>
-	<File name="sSymbol.h" open="1" top="0" tabpos="4">
+	<File name="sSymbol.h" open="1" top="0" tabpos="3">
 		<Cursor position="257" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
