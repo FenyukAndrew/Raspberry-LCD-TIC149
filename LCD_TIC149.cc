@@ -186,7 +186,7 @@ void LCD_TIC149::push_buffer_to_lcd_screen() const
     for (std::vector<Row_LCD*>::const_iterator it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
     {
         (*it)->encoder_row(buffer,count_rows);
-        if ((count_rows++)>7)
+        if ((++count_rows)>7)//Вначале увеличение, и сравнение увеличенного числа
         {
             count_rows=0;
             buffer+=width_LCD;

@@ -7,7 +7,7 @@ void Row_LCD::encoder_row(unsigned char* buffer,const unsigned char count_rows) 
 {
     for(unsigned short i=0; i<columns_in_row; i++)
     {
-        unsigned char b=((data[i]!=0) ? 1 : 0)<<count_rows;
+        unsigned char b=((data[i]!=0) ? 1 : 0)<<(7-count_rows);
         if (count_rows==0)
         {//Если первая строка - перезапись
             *buffer=b;

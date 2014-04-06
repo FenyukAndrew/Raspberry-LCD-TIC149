@@ -93,7 +93,7 @@ Debug_output_console();
 Лучше что были символы по квадратиками - т.е. по 4 в одном эранном символе
 ▀▄█▌▐
 
-▀▄█ 
+▀▄█
 
 Можно выводить в файл и при отображении изменить в настройках окна консоли выводимый шрифт - сделать его размер минимальным
 Символы выводяться по 8 бит вертикально - т.е. можно объединить по 2 по вертикали ▀▄█
@@ -219,6 +219,91 @@ http://rus-linux.net/lib.php?name=/MyLDP/sys-conf/fonts.html
 Проблема в том, что надпись только поднимается, но не опускается возможно в типах данных
 не было прописанно по умолчанию signed char
 
+
+    /*std::string str;
+    //for(short i=32;i<255;i++) str+=i;
+    str="РўРµСЃС‚РѕРІР°СЏ СЃС‚СЂРѕРєР°!Тестовая строка!";
+    std::cout << str << std::endl;
+    //Все символы <32 выводить пробел?
+
+    std::string str4=View_LCD::recodeUTF8toCP1251(str);
+    std::cout << str4 << std::endl;
+
+    std::string str5=View_LCD::iconv_recode("CP1251","UTF-8",str);;
+    std::cout << str5 << std::endl;*/
+
+    /*for(int a=0;a<32;a++)
+    {
+    for(int y=0;y<133/2;y++)
+    {
+    	std::cout << "▀ ";
+    	//std::cout << "█ ";//▌▐";//y%10;
+    	//std::cout << "▌";//▌▐";//y%10;
+    }
+    std::cout << std::endl;
+    }*/
+    //Возврат к началу экрана
+    //CSI n F 	CPL – Cursor Previous Line 	Перемещает курсор в начало n-ой (по умолчанию 1-ой) строки сверху относительно текущей.
+    //std::cout << "\x1B[32F" << "*Currect position*" << std::endl;
+    //std::cout << "\x1b[3m"; Цвет не прошел
+
+    //std::cerr<<"Standart Error"<<std::endl;
+
+void test_display_fast()
+{
+    I2CBus mI2CBus("/dev/i2c-1",0x3c);
+    LCD_TIC149_Fast* mLCD_TIC149_Fast=new LCD_TIC149_Fast(&mI2CBus,61);
+    mLCD_TIC149_Fast->clear_lcd_hardware();
+    //mLCD_TIC149_Fast->lcd_output_hardware_logo();
+
+    mLCD_TIC149_Fast->print_lcd_24(0,0,"VALEK красавец");
+    mLCD_TIC149_Fast->print_lcd_16(0,3,"VALEK красавец");
+    mLCD_TIC149_Fast->print_lcd_8(0,5,"VALEK красавец");
+    mLCD_TIC149_Fast->print_lcd_32(0,6,"012345");
+
+    mLCD_TIC149_Fast->print_lcd_32(0,0,"0123456");
+    mLCD_TIC149_Fast->print_lcd_32(0,4,"7890123");
+
+    //Вывод из буфера на экран
+    mLCD_TIC149_Fast->push_buffer_to_lcd_screen();
+}
+
+void test_display()
+{
+    I2CBus mI2CBus("/dev/i2c-1",0x3c);
+    LCD_TIC149* mLCD_TIC149=new LCD_TIC149(&mI2CBus,61);
+
+    //mLCD_TIC149->lcd_view_invert();
+    mLCD_TIC149->clear_lcd_hardware();
+    mLCD_TIC149->print_lcd(Fnt::h8,0,0,"1234567890",true);
+    mLCD_TIC149->print_lcd(Fnt::h16,0,8,"VALEK красавец",true);
+    mLCD_TIC149->print_lcd(Fnt::h24,0,24,"1DFG",true);
+    mLCD_TIC149->line(0,0,132,63);
+    mLCD_TIC149->push_buffer_to_lcd_screen();
+
+    /*m_View_LCD->point(0,0);
+    m_View_LCD->line(0,0,132,63);
+    m_View_LCD->rectangle(0,0,132,63);//Т.к. нумерация с 0
+    m_View_LCD->circle(64,32,32);
+
+    //m_View_LCD->print_lcd(Font_height::h8,0,0,"1234567890");
+    m_View_LCD->print_lcd(Fnt::h8,0,0,"1234567890",true);
+    m_View_LCD->print_lcd(Fnt::h16,0,8,"VALEK красавец",true);
+    m_View_LCD->print_lcd(Fnt::h24,0,24,"1DFG",true);
+
+    m_View_LCD->save_to_bmp(AnImage);
+    AnImage.WriteToFile("Output.bmp");
+    //m_View_LCD->debug_output_console();
+    m_View_LCD->debug_output_console_compact();*/
+}
+
+    BMP AnImage;
+    //AnImage.SetSize(133,64);
+    AnImage.SetBitDepth(1);
+
+    //test_display_fast();
+    //test_display();
+    //return 0;
 
 
 ***** СТАРОЕ
