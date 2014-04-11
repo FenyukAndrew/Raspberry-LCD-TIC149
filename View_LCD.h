@@ -53,6 +53,7 @@ public:
 
     void debug_output_console() const;
     void debug_output_console_compact() const;//Если в высоту нечетное число строк, то последняя нечетная невыводиться не будет
+    void debug_output_console_compact4() const;//Если в высоту нечетное число строк, то последняя нечетная невыводиться не будет
     void save_to_bmp(BMP& AnImage) const;
 
 protected:

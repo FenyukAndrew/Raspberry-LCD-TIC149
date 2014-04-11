@@ -55,6 +55,8 @@
 		<Unit filename="Lib_Fonts.cc" />
 		<Unit filename="Lib_Fonts.h" />
 		<Unit filename="README.txt" />
+		<Unit filename="RaspberryPi-GPIO/include/bcm2835_gpio.h" />
+		<Unit filename="RaspberryPi-GPIO/include/rpiGpio.h" />
 		<Unit filename="Row_LCD.cc" />
 		<Unit filename="Row_LCD.h" />
 		<Unit filename="Singleton.cc" />

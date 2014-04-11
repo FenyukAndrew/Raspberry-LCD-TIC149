@@ -180,6 +180,38 @@ void View_LCD::debug_output_console_compact() const
     }
 }
 
+void View_LCD::debug_output_console_compact4() const
+{
+    //Т.к. строка 8 пикселей в высоту, для печати используются 16 символов:
+    // ▖▗▄▘▌▚▙▝▞▐▟▀▛▜█
+    //0123456789012345
+    //Вес каждой позиции 2^n
+    //48    row_up
+    //12    row_down
+
+    //Символы кодируются как UniCode - т.е. несколько байт на 1 символ - поэтому массив std::string
+    const std::string symbols[16]= {" ","▖","▗","▄","▘","▌","▚","▙","▝","▞","▐","▟","▀","▛","▜","█"};
+    for (auto it = rows_LCD.begin() ; it != rows_LCD.end(); ++it)
+    {
+        const unsigned char* row_up=(*it)->get_row();
+        ++it;
+        if (it == rows_LCD.end()) return;
+        const unsigned char* row_down=(*it)->get_row();
+
+        for(ushort i=0; i<columns_in_row; )
+        {
+            unsigned char b=(((row_down[i]!=0) ? 1 : 0) | ((row_up[i]!=0) ? 4 : 0));
+            if ((++i)<columns_in_row)//Если не последняя строка
+            {
+                b|=(((row_down[i]!=0) ? 2 : 0) | ((row_up[i]!=0) ? 8 : 0));
+            }
+            i++;
+            std::cout<<symbols[b];
+        };
+        std::cout<<std::endl;
+    }
+}
+
 void View_LCD::save_to_bmp(BMP& AnImage) const
 {
     AnImage.SetSize(columns_in_row,rows_in_screen);

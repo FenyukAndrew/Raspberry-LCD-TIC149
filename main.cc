@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     //m_View_LCD->lcd_view_invert();
     m_View_LCD->clear_lcd_hardware();
 
-    std::string full_weather_str="00:00:00 "+weather_str;//"00:00:00 Это очень длинная строка. This string is very long"
+    std::string full_weather_str="00:00:00 "+weather_str+" ";//"00:00:00 Это очень длинная строка. This string is very long"
     unsigned short w1=Lib_Fonts::Instance().get_width(Fnt::h32,full_weather_str);
     View_LCD* m_View1=new View_LCD(w1,32);
     m_View1->print_lcd(Fnt::h32,0,0,full_weather_str);
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
         m_View1->drawTo(150-i,0,*m_View_LCD);
         m_View3->drawTo(i-550,30+step,*m_View_LCD);//Нужна функция вычисляющая ширину строки
 
-        //m_View_LCD->debug_output_console_compact();
+        //m_View_LCD->debug_output_console_compact4();
         m_View_LCD->push_buffer_to_lcd_screen();
 
         std::cout << "\x1B[32F";//Возврат на 32 строки вверх
