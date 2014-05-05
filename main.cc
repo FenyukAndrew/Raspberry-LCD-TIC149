@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     m_View1->print_lcd(Fnt::h32,0,0,full_weather_str);
     m_View1->line(0,31,w1-5,31);
 
-    std::string s3=" Валек красавец в натуре. Валек красавец в натуре.";
+    std::string s3=" Это длинная текстовая строка для вывода на экран. ";
     unsigned short w3=Lib_Fonts::Instance().get_width(Fnt::h16,s3);
     View_LCD* m_View3=new View_LCD(w3,17);
     m_View3->print_lcd(Fnt::h16,0,0,s3);

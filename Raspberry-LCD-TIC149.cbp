@@ -54,7 +54,7 @@
 		<Unit filename="LCD_TIC149_Fast.h" />
 		<Unit filename="Lib_Fonts.cc" />
 		<Unit filename="Lib_Fonts.h" />
-		<Unit filename="README.txt" />
+		<Unit filename="README.md" />
 		<Unit filename="RaspberryPi-GPIO/include/bcm2835_gpio.h" />
 		<Unit filename="RaspberryPi-GPIO/include/rpiGpio.h" />
 		<Unit filename="Row_LCD.cc" />
