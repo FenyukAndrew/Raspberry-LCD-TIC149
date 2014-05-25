@@ -1,3 +1,6 @@
+#ifndef SSYMBOL_H
+#define SSYMBOL_H
+
 #include "common_header.h"
 
 class View_LCD;
@@ -10,6 +13,7 @@ public:
 
     /*void set_width(unsigned short new_width) {width=new_width;};
     void set_data(const unsigned char* new_b) {b=new_b;};*/
+    const unsigned char* get_data() {return b;};
 
     unsigned short get_width() const {return width;};
 //Символ рисует сам себя
@@ -19,3 +23,5 @@ private:
     const unsigned short width;
     const unsigned char* b;          // Data
 };
+
+#endif // SSYMBOL_H

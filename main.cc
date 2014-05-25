@@ -14,13 +14,6 @@
 
 #include "Lib_Fonts.h"
 
-//Чтобы включился в выходной файл
-#include "description_font.h"
-#include "Arial_8.h"
-#include "Tahoma_16.h"
-#include "Tahoma_24.h"
-#include "Tahoma_32.h"
-
 int main(int argc, char *argv[])
 {
     Weather m_Weather("http://export.yandex.ru/weather-ng/forecasts/34929.xml");
@@ -28,12 +21,12 @@ int main(int argc, char *argv[])
     std::string weather_str="T="+m_Weather.get_weather("temperature")+" "+m_Weather.get_weather("weather_type");
 
     //Для тестового вывода в консоль
-    //View_LCD* m_View_LCD=new View_LCD(133,64);
+    View_LCD* m_View_LCD=new View_LCD(133,64);
 
-    I2CBus mI2CBus("/dev/i2c-1",0x3c);
-    LCD_TIC149* m_View_LCD=new LCD_TIC149(&mI2CBus,61);
+    //I2CBus mI2CBus("/dev/i2c-1",0x3c);
+    //LCD_TIC149* m_View_LCD=new LCD_TIC149(&mI2CBus,61);
     //m_View_LCD->lcd_view_invert();
-    m_View_LCD->clear_lcd_hardware();
+    //m_View_LCD->clear_lcd_hardware();
 
     std::string full_weather_str="00:00:00 "+weather_str+" ";//"00:00:00 Это очень длинная строка. This string is very long"
     unsigned short w1=Lib_Fonts::Instance().get_width(Fnt::h32,full_weather_str);
@@ -71,8 +64,8 @@ int main(int argc, char *argv[])
         m_View1->drawTo(150-i,0,*m_View_LCD);
         m_View3->drawTo(i-550,30+step,*m_View_LCD);//Нужна функция вычисляющая ширину строки
 
-        //m_View_LCD->debug_output_console_compact4();
-        m_View_LCD->push_buffer_to_lcd_screen();
+        m_View_LCD->debug_output_console_compact4();
+        //m_View_LCD->push_buffer_to_lcd_screen();
 
         std::cout << "\x1B[32F";//Возврат на 32 строки вверх
         //sleep(1);

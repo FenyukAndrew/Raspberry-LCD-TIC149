@@ -6,10 +6,9 @@
 #include "Utils.h"
 
 #include "description_font.h"
-extern sUnit8 Arial_8[256];
-extern sUnit16 Tahoma_16[256];
-extern sUnit24 Tahoma_24[256];
-extern sUnit32 Tahoma_32[256];
+
+#include "Lib_Fonts.h"
+#include "Font.h"
 
 LCD_TIC149_Fast::LCD_TIC149_Fast(I2CBus* m_I2CBus,const unsigned char contrast)
 {
@@ -340,6 +339,9 @@ void LCD_TIC149_Fast::print_lcd_8(char x,char y,const std::string& strIn, unsign
     std::string strCP1251=Utils::recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
     if (width>width_LCD) width=width_LCD;
+    //TODO Переделать под новый формат
+    Font* cur_font=Lib_Fonts::Instance().get_Font(Fnt::h8);
+    unsigned char PART_COUNT8=cur_font->get_PART_COUNT();
     for(unsigned char i_lcd = 0; i_lcd < PART_COUNT8; i_lcd++)//Делаем в 3 прохода
     {
         unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
@@ -347,15 +349,14 @@ void LCD_TIC149_Fast::print_lcd_8(char x,char y,const std::string& strIn, unsign
 
         for(unsigned char pos_str=0; pos_str<strlen(str1); pos_str++) //проходим по всем символам строки
         {
-            unsigned char symbol=str1[pos_str];
-            //if (symbol<32) symbol=0; else symbol-=32;
-            for(int count = (Arial_8[symbol].sH.cyPix-1)*PART_COUNT8; count >= 0; count-=PART_COUNT8)
+            sSymbol* m_symbol=cur_font->get_Symbol(str1[pos_str]);
+            for(int count = (m_symbol->get_width()-1)*PART_COUNT8; count >= 0; count-=PART_COUNT8)
             {
                 if (offset_x_buffer<width)//Лишнее обрезаем, т.е. не выводим на дисплей
                 {
                     if ((offset_y_buffer+offset_x_buffer)<size_screen_buffer)//Чтобы не было ошибки при выводе ниже нижней границы экрана
                     {
-                        screen_buffer[offset_y_buffer+offset_x_buffer]=Arial_8[symbol].b[count+i_lcd];
+                        screen_buffer[offset_y_buffer+offset_x_buffer]=m_symbol->get_data()[count+i_lcd];
                         offset_x_buffer++;
                     }
                 }
@@ -368,7 +369,8 @@ void LCD_TIC149_Fast::print_lcd_16(char x,char y,const std::string& strIn, unsig
     std::string strCP1251=Utils::recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
     if (width>width_LCD) width=width_LCD;
-    for(unsigned char i_lcd = 0; i_lcd < PART_COUNT16; i_lcd++)//Делаем в 3 прохода
+    //TODO Переделать под новый формат
+    /*for(unsigned char i_lcd = 0; i_lcd < PART_COUNT16; i_lcd++)//Делаем в 3 прохода
     {
         unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
         unsigned char offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++
@@ -389,14 +391,15 @@ void LCD_TIC149_Fast::print_lcd_16(char x,char y,const std::string& strIn, unsig
                 }
             }
         }
-    }
+    }*/
 }
 void LCD_TIC149_Fast::print_lcd_24(char x,char y,const std::string& strIn, unsigned short width, unsigned char INVERT)
 {
     std::string strCP1251=Utils::recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
     if (width>width_LCD) width=width_LCD;
-    for(unsigned char i_lcd = 0; i_lcd < PART_COUNT24; i_lcd++)//Делаем в 3 прохода
+    //TODO Переделать под новый формат
+    /*for(unsigned char i_lcd = 0; i_lcd < PART_COUNT24; i_lcd++)//Делаем в 3 прохода
     {
         unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
         unsigned char offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++
@@ -417,14 +420,15 @@ void LCD_TIC149_Fast::print_lcd_24(char x,char y,const std::string& strIn, unsig
                 }
             }
         }
-    }
+    }*/
 }
 void LCD_TIC149_Fast::print_lcd_32(char x,char y,const std::string& strIn, unsigned short width, unsigned char INVERT)
 {
     std::string strCP1251=Utils::recodeUTF8toCP1251(strIn);
     const char* str1=strCP1251.c_str();
     if (width>width_LCD) width=width_LCD;
-    for(unsigned char i_lcd = 0; i_lcd < PART_COUNT32; i_lcd++)//Делаем в 3 прохода
+    //TODO Переделать под новый формат
+    /*for(unsigned char i_lcd = 0; i_lcd < PART_COUNT32; i_lcd++)//Делаем в 3 прохода
     {
         unsigned int offset_y_buffer=(i_lcd+y)*width_LCD;
         unsigned char offset_x_buffer=x;//133 точки - от 0 до 132 , но полусается начинаем с 1 - т.к. вначале идёт ++
@@ -445,5 +449,5 @@ void LCD_TIC149_Fast::print_lcd_32(char x,char y,const std::string& strIn, unsig
                 }
             }
         }
-    }
+    }*/
 }

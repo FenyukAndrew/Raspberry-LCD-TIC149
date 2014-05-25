@@ -1,7 +1,8 @@
 #ifndef HEADER_FONTS
 #define HEADER_FONTS 1
 //Общий для всех шрифтов, сгенерированных LCDicon
-struct sHeader
+//Переделана структура .h файла
+/*struct sHeader
 {
     //const char ccChar;              // optional char - Номер символа
     const int cxPix;//Повторяется для всех символов
@@ -29,6 +30,7 @@ typedef sUnitN<SYM_8_LONG*PART_COUNT8> sUnit8;
 typedef sUnitN<SYM_16_LONG*PART_COUNT16> sUnit16;
 typedef sUnitN<SYM_24_LONG*PART_COUNT24> sUnit24;
 typedef sUnitN<SYM_32_LONG*PART_COUNT32> sUnit32;
+*/
 
 /*
 //Нужно вставить в каждое место использования

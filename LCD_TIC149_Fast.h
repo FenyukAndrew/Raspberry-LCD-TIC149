@@ -53,11 +53,4 @@ private:
     constexpr static unsigned short size_screen_buffer=1064;
     const static unsigned char screen_logo[size_screen_buffer];
     unsigned char screen_buffer[size_screen_buffer];
-
-//Получаются переменные класса или можно сделать глобальными переменными
-//Проблема копируются вместе с каждым экземпляром класса
-    /*#include "Arial_8.h"
-    #include "Tahoma_16.h"
-    #include "Tahoma_24.h"
-    #include "Tahoma_32.h"*/
 };

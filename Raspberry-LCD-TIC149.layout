@@ -1,40 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
+	<File name="Arial_8.h" open="0" top="0" tabpos="0">
+		<Cursor position="6" topLine="0" />
+	</File>
 	<File name="EasyBMP/EasyBMP.cc" open="0" top="0" tabpos="25">
 		<Cursor position="25576" topLine="978" />
 	</File>
-	<File name="Font.cc" open="1" top="0" tabpos="12">
-		<Cursor position="193" topLine="0" />
+	<File name="Font.cc" open="1" top="0" tabpos="5">
+		<Cursor position="64" topLine="0" />
 	</File>
-	<File name="Font.h" open="1" top="0" tabpos="13">
-		<Cursor position="661" topLine="0" />
+	<File name="Font.h" open="1" top="0" tabpos="6">
+		<Cursor position="854" topLine="2" />
 	</File>
 	<File name="I2CBus.cc" open="0" top="0" tabpos="12">
 		<Cursor position="26" topLine="0" />
 	</File>
-	<File name="I2CBus.h" open="1" top="0" tabpos="11">
+	<File name="I2CBus.h" open="1" top="0" tabpos="17">
 		<Cursor position="433" topLine="0" />
 	</File>
-	<File name="LCD_TIC149.cc" open="0" top="0" tabpos="15">
+	<File name="LCD_TIC149.cc" open="1" top="0" tabpos="14">
 		<Cursor position="7771" topLine="166" />
 	</File>
-	<File name="LCD_TIC149.h" open="0" top="0" tabpos="14">
+	<File name="LCD_TIC149.h" open="1" top="0" tabpos="18">
 		<Cursor position="1588" topLine="0" />
 	</File>
-	<File name="LCD_TIC149_Fast.cc" open="0" top="0" tabpos="9">
-		<Cursor position="0" topLine="0" />
+	<File name="LCD_TIC149_Fast.cc" open="1" top="1" tabpos="4">
+		<Cursor position="122" topLine="329" />
 	</File>
-	<File name="LCD_TIC149_Fast.h" open="1" top="0" tabpos="17">
-		<Cursor position="854" topLine="0" />
+	<File name="LCD_TIC149_Fast.h" open="1" top="0" tabpos="13">
+		<Cursor position="3028" topLine="7" />
 	</File>
-	<File name="Lib_Fonts.cc" open="1" top="0" tabpos="9">
-		<Cursor position="548" topLine="0" />
+	<File name="Lib_Fonts.cc" open="1" top="0" tabpos="16">
+		<Cursor position="470" topLine="7" />
 	</File>
-	<File name="Lib_Fonts.h" open="1" top="0" tabpos="10">
-		<Cursor position="684" topLine="17" />
+	<File name="Lib_Fonts.h" open="1" top="0" tabpos="8">
+		<Cursor position="1335" topLine="13" />
 	</File>
-	<File name="README.md" open="1" top="1" tabpos="6">
+	<File name="README.md" open="0" top="0" tabpos="6">
 		<Cursor position="1446" topLine="0" />
 	</File>
 	<File name="RaspberryPi-GPIO/include/bcm2835_gpio.h" open="1" top="0" tabpos="2">
@@ -46,49 +49,58 @@
 	<File name="Row_LCD.cc" open="0" top="0" tabpos="16">
 		<Cursor position="344" topLine="0" />
 	</File>
-	<File name="Row_LCD.h" open="0" top="0" tabpos="3">
-		<Cursor position="986" topLine="21" />
+	<File name="Row_LCD.h" open="1" top="0" tabpos="19">
+		<Cursor position="986" topLine="0" />
 	</File>
-	<File name="Singleton.cc" open="1" top="0" tabpos="8">
+	<File name="Singleton.cc" open="1" top="0" tabpos="2">
 		<Cursor position="122" topLine="0" />
 	</File>
-	<File name="Singleton.h" open="1" top="0" tabpos="7">
+	<File name="Singleton.h" open="0" top="0" tabpos="7">
 		<Cursor position="541" topLine="36" />
+	</File>
+	<File name="Tahoma_16.h" open="1" top="0" tabpos="1">
+		<Cursor position="6" topLine="0" />
+	</File>
+	<File name="Tahoma_24.h" open="0" top="0" tabpos="0">
+		<Cursor position="6" topLine="0" />
+	</File>
+	<File name="Tahoma_32.h" open="1" top="0" tabpos="20">
+		<Cursor position="6" topLine="0" />
 	</File>
 	<File name="Utils.cc" open="0" top="0" tabpos="11">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="Utils.h" open="1" top="0" tabpos="16">
+	<File name="Utils.h" open="0" top="0" tabpos="16">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="View_LCD.cc" open="1" top="0" tabpos="4">
-		<Cursor position="6979" topLine="183" />
+	<File name="View_LCD.cc" open="1" top="0" tabpos="10">
+		<Cursor position="6979" topLine="0" />
 	</File>
-	<File name="View_LCD.h" open="1" top="0" tabpos="5">
-		<Cursor position="2779" topLine="29" />
+	<File name="View_LCD.h" open="1" top="0" tabpos="9">
+		<Cursor position="2779" topLine="0" />
 	</File>
-	<File name="Weather.cc" open="1" top="0" tabpos="15">
+	<File name="Weather.cc" open="0" top="0" tabpos="15">
 		<Cursor position="70" topLine="3" />
 	</File>
-	<File name="Weather.h" open="1" top="0" tabpos="14">
+	<File name="Weather.h" open="0" top="0" tabpos="14">
 		<Cursor position="32" topLine="0" />
 	</File>
-	<File name="common_header.h" open="0" top="0" tabpos="3">
-		<Cursor position="253" topLine="0" />
+	<File name="common_header.h" open="1" top="0" tabpos="15">
+		<Cursor position="217" topLine="0" />
 	</File>
-	<File name="description_font.h" open="0" top="0" tabpos="22">
-		<Cursor position="0" topLine="0" />
+	<File name="description_font.h" open="1" top="0" tabpos="3">
+		<Cursor position="1362" topLine="6" />
 	</File>
-	<File name="main.cc" open="1" top="0" tabpos="1">
-		<Cursor position="700" topLine="51" />
+	<File name="main.cc" open="1" top="0" tabpos="11">
+		<Cursor position="1256" topLine="12" />
 	</File>
 	<File name="makefile" open="0" top="0" tabpos="0">
 		<Cursor position="1788" topLine="0" />
 	</File>
-	<File name="sSymbol.cc" open="0" top="0" tabpos="6">
+	<File name="sSymbol.cc" open="1" top="0" tabpos="12">
 		<Cursor position="1175" topLine="0" />
 	</File>
-	<File name="sSymbol.h" open="0" top="0" tabpos="4">
-		<Cursor position="257" topLine="0" />
+	<File name="sSymbol.h" open="1" top="0" tabpos="7">
+		<Cursor position="187" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

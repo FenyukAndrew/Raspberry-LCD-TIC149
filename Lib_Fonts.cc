@@ -3,45 +3,19 @@
 
 #include "Utils.h"
 
-#include "description_font.h"
-extern sUnit8 Arial_8[256];
-extern sUnit16 Tahoma_16[256];
-extern sUnit24 Tahoma_24[256];
-extern sUnit32 Tahoma_32[256];
+#include "Arial_8.h"
+#include "Tahoma_16.h"
+#include "Tahoma_24.h"
+#include "Tahoma_32.h"
 
 Lib_Fonts::Lib_Fonts()
 {
-    //Некрасиво - но такие входные данные
-    //Приведение формата шрифтов - в цикле, потому что разные типы входных данных
-    Font* font_Arial_8=new Font(PART_COUNT8);
-    Font* font_Tahoma_16=new Font(PART_COUNT16);
-    Font* font_Tahoma_24=new Font(PART_COUNT24);
-    Font* font_Tahoma_32=new Font(PART_COUNT32);
-    for(int i=0; i<256; i++)
-    {
-        sUnit8& u8=Arial_8[i];
-        font_Arial_8->set_Symbol(i,
-                                 new sSymbol(u8.sH.cyPix, u8.b));
-
-        sUnit16& u16=Tahoma_16[i];
-        font_Tahoma_16->set_Symbol(i,
-                                 new sSymbol(u16.sH.cyPix, u16.b));
-
-        sUnit24& u24=Tahoma_24[i];
-        font_Tahoma_24->set_Symbol(i,
-                                 new sSymbol(u24.sH.cyPix, u24.b));
-
-        sUnit32& u32=Tahoma_32[i];
-        font_Tahoma_32->set_Symbol(i,
-                                 new sSymbol(u32.sH.cyPix, u32.b));
-    }
-
     m_Fonts=new std::map<Fnt,Font*>();
     //m_Fonts->insert ( std::pair<Fnt,Font*>(Fnt::h8,font_Arial_8) );
-    (*m_Fonts)[Fnt::h8]=font_Arial_8;
-    (*m_Fonts)[Fnt::h16]=font_Tahoma_16;
-    (*m_Fonts)[Fnt::h24]=font_Tahoma_24;
-    (*m_Fonts)[Fnt::h32]=font_Tahoma_32;
+    (*m_Fonts)[Fnt::h8]=new Font(Arial_8);
+    (*m_Fonts)[Fnt::h16]=new Font(Tahoma_16);
+    (*m_Fonts)[Fnt::h24]=new Font(Tahoma_24);
+    (*m_Fonts)[Fnt::h32]=new Font(Tahoma_32);
 }
 
 Lib_Fonts::~Lib_Fonts()
