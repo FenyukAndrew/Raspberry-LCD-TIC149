@@ -6,6 +6,7 @@ public:
 
     void write_to_buffer(const unsigned char byte);
     void send_buffer();
+    void send_buffer(const unsigned char* ptr,unsigned short count_bytes);
 
     //Для непосредственных операциях в буфере
     unsigned char* get_currect_ptr_buffer()

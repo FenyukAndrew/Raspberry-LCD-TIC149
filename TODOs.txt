@@ -1,3 +1,23 @@
+Провести тест:
+LCD_TIC149_Fast - вывод текста, logo, point
+
+Текущее:
+переделать все вызовы mI2CBus->write_to_buffer на статический массив в классах LCD_TIC149 и LCD_TIC149_Fast
+
+Часть функций классов LCD_TIC149 и LCD_TIC149_Fast можно объединить - одинаковый код (инициализация экрана, аппаратная очитска)
+сделать как шаблоны
+LCD_TIC149_Fast и LCD_TIC149_Fast
+    void line(short x1, short y1, const short x2, const short y2,const unsigned char color_code=DEFAULT_COLOR);
+    void circle(const short x_center, const short y_center, const short radius, const unsigned char color_code=DEFAULT_COLOR);
+    void rectangle(short x1, short y1, short x2, short y2, const unsigned char color_code=DEFAULT_COLOR);
+    
+Возможно добавить в LCD_TIC149_Fast быстрое рисование горизонтальных и вертикальных линий как наиболее востребуемых
+Вертикальные: заполнять байт целиком - концы побитно
+Горизонтальные: можно применять операцию OR для всей строки байт
+
+
+
+
 Проект для работы с экраном на C++
 
 Может есть смысл представить экран не в виде массива - а в виде строк, объединенных в список (через список указателей). Не потребуется тупое умножение. Кодирование символов по-любому не менять - т.к. это стандрт, генерируемый программой.

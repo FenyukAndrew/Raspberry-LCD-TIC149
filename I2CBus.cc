@@ -52,3 +52,13 @@ void I2CBus::send_buffer()
 
     count=0;
 };
+
+void I2CBus::send_buffer(const unsigned char* ptr,unsigned short count_bytes)
+{
+    int result=write(fd, ptr, count_bytes);
+    if (result != count_bytes)                         // Send register we want to read from
+    {
+        printf("Error writing to i2c slave=%d\n",result);
+        exit(1);
+    }
+};
