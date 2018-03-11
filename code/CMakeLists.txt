@@ -34,6 +34,9 @@ endif()
 
 set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/..")
 
+find_package(Threads REQUIRED)
+find_package(CURL REQUIRED)
+find_package(TinyXML REQUIRED)
 
 ############# BEGIN EASY_BMP ##############
 set(EASY_BMP easy_bmp)
@@ -42,6 +45,7 @@ set(EASY_BMP_DIR "${CODE_DIR}/EasyBMP")
 file(GLOB EASY_BMP_SOURCES
     "${EASY_BMP_DIR}/*.h"
     "${EASY_BMP_DIR}/*.hpp"
+    "${EASY_BMP_DIR}/*.cc"
     "${EASY_BMP_DIR}/*.cpp")
 
 add_library(${EASY_BMP} STATIC ${EASY_BMP_SOURCES})
@@ -57,8 +61,8 @@ add_library(${EASY_BMP} STATIC ${EASY_BMP_SOURCES})
 set(DISPLAY display)
 file(GLOB DISPLAY_SRC
     "${CODE_DIR}/*.h"
-    "${CODE_DIR}/*.cc"
     "${CODE_DIR}/*.hpp"
+    "${CODE_DIR}/*.cc"
     "${CODE_DIR}/*.cpp"
 )
 
@@ -69,7 +73,7 @@ set(COMMON_LINK_LIBRARIES
         -lrt
 )
 
-add_executable(${DISPLAY} "${CODE_DIR}/Main.cpp")
+add_executable(${DISPLAY} ${DISPLAY_SRC})
 target_link_libraries(${DISPLAY} 
     ${COMMON_LINK_LIBRARIES}
     ${EASY_BMP}
