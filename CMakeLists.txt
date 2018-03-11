@@ -11,7 +11,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -fPIC -pipe -fomit-frame-pointer -funroll-all-loops -s")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
 
-option(USE_DEFAULT_INSTALL_PREFIX "Use default install prefix 'code_dir/target'?" ON)
+option(USE_DEFAULT_INSTALL_PREFIX "Use default install prefix 'project_dir/target'?" ON)
 option(ENABLE_SANITIZERS "Build with sanitizes: leak, address?" OFF)
 
 if (${ENABLE_SANITIZERS})
@@ -71,6 +71,5 @@ target_link_libraries(${DISPLAY}
 
 
 install(TARGETS
-    ${GATEWAY}
-    ${COMMON}
-    DESTINATION bin)
+    ${DISPLAY}
+    DESTINATION .)
