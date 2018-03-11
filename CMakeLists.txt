@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 project(Raspberry-LCD-TIC149)
 
 
-
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 if(NOT EXISTS ${CMAKE_BUILD_TYPE})
@@ -19,18 +18,12 @@ if (${ENABLE_SANITIZERS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=leak -fsanitize=address")
 endif()
 
-set(PROJECT_DIR "${CMAKE_SOURCE_DIR}/..")
+set(PROJECT_DIR "${CMAKE_SOURCE_DIR}")
 set(CODE_DIR "${PROJECT_DIR}/code")
 
 if (${USE_DEFAULT_INSTALL_PREFIX})
     set(CMAKE_INSTALL_PREFIX "${PROJECT_DIR}/target")
 endif()
-
-# set(DEPS_DIR "${PROJECT_DIR}/../deps-c" CACHE PATH "Path to deps-c dir")
-# set(FRAMEWORK_DIR "${PROJECT_DIR}/../framework-c" CACHE PATH "Path to framework-c dir")
-# set(DEPS_INCLUDE_DIR "${DEPS_DIR}/root/include")
-# set(DEPS_LIB_DIR "${DEPS_DIR}/root/lib")
-
 
 set(CMAKE_INSTALL_RPATH "$ORIGIN;$ORIGIN/..")
 
@@ -49,11 +42,6 @@ file(GLOB EASY_BMP_SOURCES
     "${EASY_BMP_DIR}/*.cpp")
 
 add_library(${EASY_BMP} STATIC ${EASY_BMP_SOURCES})
-# target_include_directories(${COMMON} SYSTEM PRIVATE ${DEPS_INCLUDE_DIR})
-# target_include_directories(${COMMON} PUBLIC
-#     ${INCLUDE_DIR}
-# )
-
 ############# END EASY_BMP ##############
 
 
@@ -79,8 +67,6 @@ target_link_libraries(${DISPLAY}
     ${EASY_BMP}
     -lcurl
     -ltinyxml)
-
-
 ############# END DISPLAY ##############
 
 
