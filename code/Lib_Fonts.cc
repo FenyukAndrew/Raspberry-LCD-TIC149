@@ -3,10 +3,10 @@
 
 #include "Utils.h"
 
-#include "Arial_8.h"
-#include "Tahoma_16.h"
-#include "Tahoma_24.h"
-#include "Tahoma_32.h"
+#include "fonts/Arial_8.h"
+#include "fonts/Tahoma_16.h"
+#include "fonts/Tahoma_24.h"
+#include "fonts/Tahoma_32.h"
 
 Lib_Fonts::Lib_Fonts()
 {
